@@ -574,16 +574,11 @@ public class Database
 
 		string[] keys = json.keys.to_array();
 		foreach (string key in keys) {
-			// ID is filled by decode_set().
+			// ID and type are filled by decode_set().
 			if (key == "id"	|| key == "_guid")
 				continue;
-
-			// The "type" key defines object type only if it appears
-			// in the root of a JSON object (k == "").
-			if (k == "") {
-				if (key == "type" || key == "_type")
-					set_object_type(id, (string)json[key]);
-			}
+			if (k == "" && (key == "type" || key == "_type"))
+				continue;
 
 			Value? val = json[key];
 
@@ -625,32 +620,39 @@ public class Database
 
 			create_internal(0, obj_id);
 
-			// Determine the object's type based on the type of its
-			// parent and other heuristics.
-			string owner_type = object_type(owner_id);
-			if (owner_type == "level") {
-				if (key == "units")
-					set_object_type(obj_id, "unit");
-				else if (key == "sounds")
-					set_object_type(obj_id, OBJECT_TYPE_SOUND_SOURCE);
-				else
-					set_object_type(obj_id, "undefined");
-			} else if (owner_type == "state_machine") {
-				if (key == "states")
-					set_object_type(obj_id, "state_machine_node");
-				else if (key == "variables")
-					set_object_type(obj_id, "state_machine_variable");
-				else
-					set_object_type(obj_id, "undefined");
-			} else if (owner_type == "state_machine_node") {
-				if (key == "animations")
-					set_object_type(obj_id, "node_animation");
-				else if (key == "transitions")
-					set_object_type(obj_id, "node_transition");
-			} else if (owner_type == "sprite") {
-				if (key == "frames") {
-					set_object_type(obj_id, "sprite_frame");
-					set_property_internal(0, obj_id, "index", (double)i);
+			// Decode object type.
+			if (obj.has_key("type")) {
+				set_object_type(obj_id, (string)obj["type"]);
+			} else if (obj.has_key("_type")) {
+				set_object_type(obj_id, (string)obj["_type"]);
+			} else {
+				// Determine the object's type based on the type of its
+				// parent and other heuristics.
+				string owner_type = object_type(owner_id);
+				if (owner_type == "level") {
+					if (key == "units")
+						set_object_type(obj_id, "unit");
+					else if (key == "sounds")
+						set_object_type(obj_id, OBJECT_TYPE_SOUND_SOURCE);
+					else
+						set_object_type(obj_id, "undefined");
+				} else if (owner_type == "state_machine") {
+					if (key == "states")
+						set_object_type(obj_id, "state_machine_node");
+					else if (key == "variables")
+						set_object_type(obj_id, "state_machine_variable");
+					else
+						set_object_type(obj_id, "undefined");
+				} else if (owner_type == "state_machine_node") {
+					if (key == "animations")
+						set_object_type(obj_id, "node_animation");
+					else if (key == "transitions")
+						set_object_type(obj_id, "node_transition");
+				} else if (owner_type == "sprite") {
+					if (key == "frames") {
+						set_object_type(obj_id, "sprite_frame");
+						set_property_internal(0, obj_id, "index", (double)i);
+					}
 				}
 			}
 
@@ -862,7 +864,11 @@ public class Database
 	public string object_type(Guid id)
 	{
 		assert(has_object(id));
-		return (string)get_data(id)["_type"];
+
+		if (id == GUID_ZERO)
+			return "database";
+		else
+			return (string)get_data(id)["_type"];
 	}
 
 	// Sets the @a type of the object @a id.
