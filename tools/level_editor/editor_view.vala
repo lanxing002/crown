@@ -11,7 +11,7 @@ extern uint gdk_win32_window_get_handle(Gdk.Window window);
 
 namespace Crown
 {
-public class EditorView : Gtk.EventBox
+public class EditorView : MyEventBox
 {
 	// Data
 	private RuntimeInstance _runtime;
@@ -89,6 +89,7 @@ public class EditorView : Gtk.EventBox
 			| Gdk.EventMask.KEY_RELEASE_MASK
 			| Gdk.EventMask.FOCUS_CHANGE_MASK
 			| Gdk.EventMask.SCROLL_MASK
+			| Gdk.EventMask.STRUCTURE_MASK // map_event
 			;
 		this.focus_out_event.connect(on_event_box_focus_out_event);
 		this.size_allocate.connect(on_size_allocate);
@@ -102,9 +103,7 @@ public class EditorView : Gtk.EventBox
 			this.scroll_event.connect(on_scroll);
 		}
 
-		this.realize.connect(on_event_box_realized);
 		this.set_visual(Gdk.Screen.get_default().get_system_visual());
-		this.events |= Gdk.EventMask.STRUCTURE_MASK; // map_event
 		this.map_event.connect(() => {
 				device_frame_delayed(16, _runtime);
 				return Gdk.EVENT_PROPAGATE;
@@ -286,8 +285,10 @@ public class EditorView : Gtk.EventBox
 		}
 	}
 
-	private void on_event_box_realized()
+	public override void realize()
 	{
+		base.realize();
+
 		this.get_window().ensure_native();
 #if CROWN_PLATFORM_LINUX
 		this.get_display().sync();
