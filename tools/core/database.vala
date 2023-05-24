@@ -791,7 +791,7 @@ public class Database
 		_data.unset(id);
 	}
 
-	private void set_property_internal(int dir, Guid id, string key, Value? value)
+	public void set_property_internal(int dir, Guid id, string key, Value? value)
 	{
 		assert(has_object(id));
 		assert(is_valid_key(key));

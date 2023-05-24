@@ -192,6 +192,25 @@ namespace LevelEditorApi
 			return "LevelEditor:camera_view_perspective()";
 	}
 
+	public string restore_camera(Vector3 pos
+		, Quaternion rot
+		, Vector3 persp_pos
+		, Quaternion persp_rot
+		, double ortho_size
+		, double target_distance
+		, string proj_type
+		)
+	{
+		return """LevelEditor._camera:restore(%s, %s, %s, %s, "%.17g", "%.17g", "%s")""".printf(Lua.vector3(pos)
+			, Lua.quaternion(rot)
+			, Lua.vector3(persp_pos)
+			, Lua.quaternion(persp_rot)
+			, ortho_size
+			, target_distance
+			, proj_type
+			);
+	}
+
 	public string frame_objects(Guid?[] ids)
 	{
 		StringBuilder sb = new StringBuilder();

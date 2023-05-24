@@ -189,6 +189,32 @@ function Camera:update(dt, dx, dy, keyboard, mouse)
 	end
 end
 
+function Camera:send_state()
+	local pers_local_pose = self._perspective_local_pose:unbox()
+
+	Device.console_send { type = "camera"
+		, position = Matrix4x4.translation(self:local_pose())
+		, rotation = Matrix4x4.rotation(self:local_pose())
+		, perspective_local_position = Matrix4x4.translation(pers_local_pose)
+		, perspective_local_rotation = Matrix4x4.rotation(pers_local_pose)
+		, orthographic_size = self._orthographic_size
+		, target_distance = self._target_distance
+		, projection_type = World.camera_projection_type(self._world, self:camera())
+		}
+end
+
+function Camera:restore(pos, rot, persp_pos, persp_rot, ortho_size, target_distance, proj_type)
+	local local_pose = Matrix4x4.from_quaternion_translation(rot, pos)
+	local pers_local_pose = Matrix4x4.from_quaternion_translation(persp_rot, persp_pos)
+
+	self:set_local_pose(local_pose)
+	self._perspective_local_pose:store(pers_local_pose)
+	self._orthographic_size = ortho_size
+	self._target_distance = target_distance
+	World.camera_set_orthographic_size(self._world, self:camera(), ortho_size)
+	World.camera_set_projection_type(self._world, self:camera(), proj_type)
+end
+
 function Camera:set_mode(mode, x, y)
 	self._drag_start_cursor_xy:store(x, y, 0)
 	self._drag_start_camera_pose:store(self:local_pose())
@@ -231,4 +257,5 @@ function Camera:frame_obb(obb_tm, obb_he)
 
 	self:set_local_pose(camera_pose)
 	self._target_distance = camera_target_distance
+	self:send_state()
 end

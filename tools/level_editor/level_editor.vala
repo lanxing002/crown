@@ -978,6 +978,7 @@ public class LevelEditorApplication : Gtk.Application
 		// Update editor view with current editor state.
 		_level.send_level();
 		send_state();
+		send_camera_state();
 		_preferences_dialog.apply();
 		_editor.send(DeviceApi.frame());
 	}
@@ -1115,6 +1116,14 @@ public class LevelEditorApplication : Gtk.Application
 			}
 
 			_level.on_selection(ids);
+		} else if (msg_type == "camera") {
+			_database.set_property_internal(0, _level._id, "editor.camera.position", Vector3.from_array((ArrayList<Value?>)msg["position"]));
+			_database.set_property_internal(0, _level._id, "editor.camera.rotation", Quaternion.from_array((ArrayList<Value?>)msg["rotation"]));
+			_database.set_property_internal(0, _level._id, "editor.camera.perspective_local_position", Vector3.from_array((ArrayList<Value?>)msg["perspective_local_position"]));
+			_database.set_property_internal(0, _level._id, "editor.camera.perspective_local_rotation", Quaternion.from_array((ArrayList<Value?>)msg["perspective_local_rotation"]));
+			_database.set_property_internal(0, _level._id, "editor.camera.orthographic_size", (double)msg["orthographic_size"]);
+			_database.set_property_internal(0, _level._id, "editor.camera.target_distance", (double)msg["target_distance"]);
+			_database.set_property_internal(0, _level._id, "editor.camera.projection_type", (string)msg["projection_type"]);
 		} else if (msg_type == "error") {
 			loge((string)msg["message"]);
 		} else {
@@ -1150,6 +1159,23 @@ public class LevelEditorApplication : Gtk.Application
 		append_editor_state(sb);
 		append_project_state(sb);
 		_editor.send_script(sb.str);
+	}
+
+	private void send_camera_state()
+	{
+		if (!_database.has_property(_level._id, "editor.camera.position"))
+			return;
+
+		string script = LevelEditorApi.restore_camera(_database.get_property_vector3(_level._id, "editor.camera.position")
+			, _database.get_property_quaternion(_level._id, "editor.camera.rotation")
+			, _database.get_property_vector3(_level._id, "editor.camera.perspective_local_position")
+			, _database.get_property_quaternion(_level._id, "editor.camera.perspective_local_rotation")
+			, _database.get_property_double(_level._id, "editor.camera.orthographic_size")
+			, _database.get_property_double(_level._id, "editor.camera.target_distance")
+			, _database.get_property_string(_level._id, "editor.camera.projection_type")
+			);
+
+		_editor.send_script(script);
 	}
 
 	private bool on_button_press(Gdk.EventButton ev)
@@ -1677,6 +1703,7 @@ public class LevelEditorApplication : Gtk.Application
 		if (_editor.is_connected()) {
 			_level.send_level();
 			send_state();
+			send_camera_state();
 			_editor.send(DeviceApi.frame());
 		}
 
