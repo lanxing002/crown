@@ -164,6 +164,20 @@ public class ProjectBrowser : Gtk.Box
 		_tree_view.button_press_event.connect(on_button_pressed);
 		_tree_view.button_release_event.connect(on_button_released);
 
+		const Gtk.TargetEntry _drag_targets[] =
+		{
+			// Target
+			// |      Flags
+			// |      |  Info
+			// |      |  |
+			{ "text/uri-list", 0, 0 },
+			{ "text/plain",    0, 0 },
+		};
+		_tree_view.enable_model_drag_dest(_drag_targets
+			, Gdk.DragAction.COPY
+			| Gdk.DragAction.MOVE
+			);
+
 		_tree_selection = _tree_view.get_selection();
 		_tree_selection.set_mode(Gtk.SelectionMode.BROWSE);
 
