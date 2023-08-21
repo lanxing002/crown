@@ -14,3 +14,11 @@ unit = [
 level = [
 	"levels/test"
 ]
+material = [
+	"fonts/monospace"
+	"fonts/monospace2"
+]
+font = [
+	"fonts/monospace"
+	"fonts/monospace2"
+]
