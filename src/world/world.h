@@ -9,7 +9,7 @@
 #include "core/math/types.h"
 #include "core/strings/string_id.h"
 #include "core/types.h"
-#include "lua/types.h"
+#include "lua/lua_environment.h"
 #include "resource/types.h"
 #include "world/event_stream.h"
 #include "world/gui.h"

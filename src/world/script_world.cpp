@@ -7,8 +7,8 @@
 #include "core/containers/hash_map.inl"
 #include "core/strings/string_id.inl"
 #include "device/device.h"
-#include "lua/lua_environment.h"
-#include "lua/lua_stack.inl"
+//#include "lua/lua_environment.h"
+//#include "lua/lua_stack.inl"
 #include "resource/resource_manager.h"
 #include "world/script_world.h"
 #include "world/unit_manager.h"
@@ -47,7 +47,7 @@ namespace script_world
 			);
 
 		ScriptWorld::ScriptData sd;
-		sd.module_ref = LUA_REFNIL;
+		/*sd.module_ref = LUA_REFNIL;
 
 		if (script_i != UINT32_MAX) {
 			sd = sw._script[script_i];
@@ -63,7 +63,7 @@ namespace script_world
 
 			array::push_back(sw._script, sd);
 			hash_map::set(sw._cache, desc.script_resource, script_i);
-		}
+		}*/
 
 		ScriptWorld::InstanceData data;
 		data.unit     = unit;
@@ -73,7 +73,7 @@ namespace script_world
 		array::push_back(sw._data, data);
 		hash_map::set(sw._map, unit, instance_i);
 
-		if (!sw._disable_callbacks) {
+		/*if (!sw._disable_callbacks) {
 			LuaStack stack(sw._lua_environment->L);
 			lua_rawgeti(stack.L, LUA_REGISTRYINDEX, sd.module_ref);
 			lua_getfield(stack.L, -1, "spawned");
@@ -88,7 +88,7 @@ namespace script_world
 				device()->pause();
 			}
 			stack.pop(1);
-		}
+		}*/
 
 		return script_world_internal::make_instance(instance_i);
 	}
@@ -102,7 +102,7 @@ namespace script_world
 		const UnitId last_u = sw._data[last_i].unit;
 		const u32 script_i  = sw._data[unit_i].script_i;
 
-		if (!sw._disable_callbacks) {
+		/*if (!sw._disable_callbacks) {
 			LuaStack stack(sw._lua_environment->L);
 			lua_rawgeti(stack.L, LUA_REGISTRYINDEX, sw._script[script_i].module_ref);
 			lua_getfield(stack.L, -1, "unspawned");
@@ -117,7 +117,7 @@ namespace script_world
 				device()->pause();
 			}
 			stack.pop(1);
-		}
+		}*/
 
 		sw._data[unit_i] = sw._data[last_i];
 		hash_map::set(sw._map, last_u, unit_i);
@@ -134,7 +134,7 @@ namespace script_world
 		if (sw._disable_callbacks)
 			return;
 
-		LuaStack stack(sw._lua_environment->L);
+		/*LuaStack stack(sw._lua_environment->L);
 
 		for (u32 i = 0; i < array::size(sw._script); ++i) {
 			lua_rawgeti(stack.L, LUA_REGISTRYINDEX, sw._script[i].module_ref);
@@ -147,7 +147,7 @@ namespace script_world
 				device()->pause();
 			}
 			stack.pop(1);
-		}
+		}*/
 	}
 
 	void collision(ScriptWorld &sw, const PhysicsCollisionEvent &ev)
@@ -155,7 +155,7 @@ namespace script_world
 		if (sw._disable_callbacks)
 			return;
 
-		for (u32 i = 0; i < array::size(sw._data); ++i) {
+		/*for (u32 i = 0; i < array::size(sw._data); ++i) {
 			if (sw._data[i].unit == ev.units[0] || sw._data[i].unit == ev.units[1]) {
 				int unit_index = sw._data[i].unit == ev.units[0] ? 0 : 1;
 
@@ -203,7 +203,7 @@ namespace script_world
 					break;
 				}
 			}
-		}
+		}*/
 
 		// Unit not found
 	}

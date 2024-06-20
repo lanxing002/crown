@@ -347,29 +347,29 @@ bool Device::frame()
 		_resource_manager->complete_requests();
 
 		{
-			const s64 t0 = time::now();
-			LuaStack stack(_lua_environment->L);
-			stack.push_float(dt);
-			_lua_environment->call_global("update", 1);
-			RECORD_FLOAT("lua.update", f32(time::seconds(time::now() - t0)));
+			//const s64 t0 = time::now();
+			//LuaStack stack(_lua_environment->L);
+			//stack.push_float(dt);
+			//_lua_environment->call_global("update", 1);
+			//RECORD_FLOAT("lua.update", f32(time::seconds(time::now() - t0)));
 		}
 		{
-			const s64 t0 = time::now();
-			LuaStack stack(_lua_environment->L);
-			stack.push_float(dt);
-			_lua_environment->call_global("render", 1);
-			RECORD_FLOAT("lua.render", f32(time::seconds(time::now() - t0)));
+			//const s64 t0 = time::now();
+			//LuaStack stack(_lua_environment->L);
+			//stack.push_float(dt);
+			//_lua_environment->call_global("render", 1);
+			//RECORD_FLOAT("lua.render", f32(time::seconds(time::now() - t0)));
 		}
 
 		if (_bgfx_callback->_screenshot_ready) {
 			_bgfx_callback->_screenshot_ready = 0;
-			LuaStack stack(_lua_environment->L);
-			stack.push_string(_bgfx_callback->_screenshot_path.c_str());
-			_lua_environment->call_global("screenshot", 1);
+			//LuaStack stack(_lua_environment->L);
+			//stack.push_string(_bgfx_callback->_screenshot_path.c_str());
+			//_lua_environment->call_global("screenshot", 1);
 		}
 	}
 
-	_lua_environment->reset_temporaries();
+	//_lua_environment->reset_temporaries();
 	_input_manager->update();
 
 	const bgfx::Stats *stats = bgfx::getStats();
@@ -559,7 +559,7 @@ void Device::run()
 	_input_manager    = CE_NEW(_allocator, InputManager)(default_allocator());
 	_unit_manager     = CE_NEW(_allocator, UnitManager)(default_allocator());
 	_lua_environment  = CE_NEW(_allocator, LuaEnvironment)();
-	_lua_environment->register_console_commands(*_console_server);
+	//_lua_environment->register_console_commands(*_console_server);
 
 	audio_globals::init();
 	physics_globals::init(_allocator);
@@ -568,9 +568,9 @@ void Device::run()
 	boot_package->load();
 	boot_package->flush();
 
-	_lua_environment->load_libs();
-	_lua_environment->require(_boot_config.boot_script_name.c_str());
-	_lua_environment->execute_string(_options._lua_string.value().c_str());
+	//_lua_environment->load_libs();
+	//_lua_environment->require(_boot_config.boot_script_name.c_str());
+	//_lua_environment->execute_string(_options._lua_string.value().c_str());
 
 	_pipeline = CE_NEW(_allocator, Pipeline)();
 	_pipeline->create(_width, _height);
@@ -579,7 +579,7 @@ void Device::run()
 
 	logi(DEVICE, "Initialized in " TIME_FMT, time::seconds(time::now() - run_t0));
 
-	_lua_environment->call_global("init");
+	//_lua_environment->call_global("init");
 
 	_prev_width = _width;
 	_prev_height = _height;
@@ -591,7 +591,7 @@ void Device::run()
 	while (!frame()) { }
 #endif
 
-	_lua_environment->call_global("shutdown");
+	//_lua_environment->call_global("shutdown");
 
 	boot_package->unload();
 	destroy_resource_package(*boot_package);
@@ -828,8 +828,8 @@ void Device::refresh(const char *json)
 	if (!array::size(list)) {
 		logi(DEVICE, "Nothing to refresh");
 	} else {
-		if (refresh_lua)
-			_lua_environment->reload();
+		//if (refresh_lua);
+			//_lua_environment->reload();
 	}
 
 	if (_paused)

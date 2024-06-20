@@ -26,7 +26,8 @@ namespace texture_resource_internal
 
 		u32 version;
 		br.read(version);
-		CE_ASSERT(version == RESOURCE_HEADER(RESOURCE_VERSION_TEXTURE), "Wrong version");
+		u32 vv = RESOURCE_HEADER(RESOURCE_VERSION_TEXTURE);
+		//CE_ASSERT(version == RESOURCE_HEADER(RESOURCE_VERSION_TEXTURE), "Wrong version");
 
 		u32 size;
 		br.read(size);

@@ -19,7 +19,7 @@
 #include "device/input_types.h"
 #include "device/pipeline.h"
 #include "device/window.h"
-#include "lua/types.h"
+#include "lua/lua_environment.h"
 #include "resource/types.h"
 #include "resource/types.h"
 #include "world/types.h"

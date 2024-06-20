@@ -4,7 +4,8 @@
  */
 
 #include "core/containers/types.h"
-#include "lua/types.h"
+//#include "lua/types.h"
+#include "lua/lua_environment.h"
 #include "resource/types.h"
 #include "world/types.h"
 
