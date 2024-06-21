@@ -30,36 +30,6 @@ function crown_project(_name, _kind, _defines)
 			"bullet",
 		}
 
-		if not _OPTIONS["no-lua"] then
-			if not _OPTIONS["no-luajit"] then
-				includedirs {
-					CROWN_DIR .. "3rdparty/luajit/src",
-				}
-
-				configuration { "not vs*" }
-					links {
-						"luajit"
-					}
-
-				configuration { "vs*"}
-					links {
-						"lua51"
-					}
-
-				configuration {}
-			else
-				includedirs {
-					CROWN_DIR .. "3rdparty/lua/src",
-				}
-
-				links { "lua" }
-
-				defines {
-					"CROWN_USE_LUAJIT=0",
-				}
-			end
-		end
-
 		configuration { "debug" }
 			defines {
 				"BX_CONFIG_DEBUG=1",

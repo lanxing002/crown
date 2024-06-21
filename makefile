@@ -15,7 +15,7 @@ MAKE_JOBS=1
 build/projects/vs2019:
 	$(GENIE) --file=3rdparty/bgfx/scripts/genie.lua --with-tools vs2019
 	$(GENIE) --file=3rdparty/bimg/scripts/genie.lua --with-tools vs2019
-	$(GENIE) --gfxapi=d3d11 --with-tools --no-level-editor vs2019
+	$(GENIE) --gfxapi=d3d11 --with-tools vs2019
 
 windows-debug64:          \
 	build/projects/vs2019 \

@@ -14,34 +14,13 @@ function copyLib()
 end
 
 newoption {
-	trigger = "no-lua",
-	description = "Build without Lua scripting."
-}
-
-newoption {
-	trigger = "no-luajit",
-	description = "Build with regular Lua."
-}
-
-newoption {
 	trigger = "with-tools",
 	description = "Build with tools."
 }
 
 newoption {
-	trigger = "no-level-editor",
-	description = "Do not build Level Editor."
-}
-
-newoption {
 	trigger = "gfxapi",
 	description = "BGFX renderer (gl32, gles3, d3d11)."
-}
-
-newaction {
-	trigger = "create-meson-build",
-	description = "Create meson.build.",
-	execute = function() dofile("scripts/create-meson-build.lua") end
 }
 
 solution "crown"
@@ -89,13 +68,7 @@ dofile ("openal.lua")
 openal_project(os.is("windows") and "SharedLib" or "StaticLib")
 
 dofile ("bullet.lua")
-dofile ("lua.lua")
-dofile ("luac.lua")
 
 if _OPTIONS["with-tools"] then
 	group "tools"
-
-	if not _OPTIONS["no-level-editor"] then
-		dofile ("level-editor.lua")
-	end
 end
