@@ -570,8 +570,10 @@ void Device::run()
 	boot_package->load();
 	boot_package->flush();
 
+	_py_wrapper->append_sys_path(_options._source_dir.value().c_str());
 	_py_wrapper->import_file(_boot_config.boot_script_name.c_str());
 	_py_wrapper->execute_string(_options._lua_string.value().c_str());
+	_py_wrapper->execute_string("boot.boott()");
 
 	auto cc = _boot_config.boot_script_name.c_str();
 	_pipeline = CE_NEW(_allocator, Pipeline)();

@@ -31,74 +31,38 @@ crown::PyWrapper::~PyWrapper()
 
 void crown::PyWrapper::init(const char** argv)
 {
-	PyObject* pName, * pModule, * pFunc;
-	PyObject* pArgs, * pValue;
+	// setup python library path
+	size_t len = std::strlen(argv[0]) + 1; // ∞¸¿®ø’÷’÷π∑˚
+	std::vector<wchar_t> buffer(len);
+	std::mbstowcs(buffer.data(), argv[0], len);
+	std::wstring exe_file = std::wstring(buffer.data());
+	auto pos = exe_file.find_last_of(L"/\\");
+	CE_ASSERT(pos != std::string::npos, "executable file has no directory: %s", argv[0]);
+	std::wstring dir = exe_file.substr(0, pos);
+	std::wstring py_lib_dir = dir + L"/../../../3rdparty/python";
 
 	PyConfig config;
-
-	wchar_t wstr1[1024] = L"Python";
 	PyConfig_InitIsolatedConfig(&config);
+	PyConfig_SetString(&config, &config.program_name, L"python");
+	PyConfig_SetString(&config, &config.home, py_lib_dir.c_str());
 	config.use_environment = 0;
-	config.program_name = wstr1;
-	wchar_t wstr2[1024] = L"C:/Users/Lenovo/Documents/gly/crown/3rdparty/python";
-	config.home = wstr2;
 	config.install_signal_handlers = 0;
 	config.safe_path = 0;
+	PyStatus status = Py_InitializeFromConfig(&config);
+	CE_ASSERT(Py_IsInitialized(), "python initialization failed: %s\n", status.err_msg);
 
-	Py_InitializeFromConfig(&config);
+	_local = PyDict_New();
+	_global = PyDict_New();
+	PyDict_SetItemString(_global, "__builtins__", PyEval_GetBuiltins());
 
-
-	Py_Initialize();
-	PyRun_SimpleString("print('-AA----\n' * 10)");
-	//Py_CompileString(TCHAR_TO_UTF8(InStr), TCHAR_TO_UTF8(InContext), InMode);
-	//if (!PyCodeObj)
-	//{
-	//	return nullptr;
-	//}
-	//PyEval_EvalCode();
-	PyRun_SimpleString("import sys");
-	PyRun_SimpleString("sys.path.append('C:/Users/zele/Documents/code_ws/Project2/x64/Debug')");
-	PyRun_SimpleString("print(1 + 2)");
-
-	//pName = PyUnicode_DecodeFSDefault(argv[1]);
-	/* Error checking of pName left out */
-
-	//pModule = PyImport_Import(pName);
-	//Py_DECREF(pName);
-
-	//PyObject* py_name, * py_module, * py_func;
-	//PyObject* args, * value;
-
-	//size_t len = std::strlen(argv[0]) + 1; // ∞¸¿®ø’÷’÷π∑˚
-	//std::vector<wchar_t> buffer(len);
-	//std::mbstowcs(buffer.data(), argv[0], len);
-
-	//// setup python library path
-	//std::wstring exe_file = std::wstring(buffer.data());
-	//auto pos = exe_file.find_last_of(L"/\\");
-	//CE_ASSERT(pos != std::string::npos, "executable file has no directory: %s", argv[0]);
-	//std::wstring dir = exe_file.substr(0, pos);
-	//std::wstring py_lib_dir = dir + L"/../../../3rdparty/python";
-
-	//PyConfig config;
-	//PyConfig_InitIsolatedConfig(&config);
-	//config.use_environment = 0;
-	//config.install_signal_handlers = 0;
-	//config.safe_path = 0;
-	//PyConfig_SetString(&config, &config.program_name, L"Python");
-	//PyConfig_SetString(&config, &config.home, py_lib_dir.c_str()); //TODO:
-	//auto status = Py_InitializeFromConfig(&config);
-	//Py_Initialize();
-
-	////CE_ASSERT(PyStatus_Exception(status), "python initialization failed: %s\n", status.err_msg);
-	//PyConfig_Clear(&config);
-
-	//PyRun_String("print(1 + 2)", Py_single_input, PyEval_GetGlobals(), PyEval_GetLocals());
+	PyConfig_Clear(&config);
 }
 
 void crown::PyWrapper::append_sys_path(const char* path)
 {
-
+	execute_string("import sys");
+	std::string p = std::string("sys.path.append(R\"") + path + "\")";
+	execute_string(p.c_str());
 }
 
 void crown::PyWrapper::import_file(const char* name)
@@ -113,14 +77,37 @@ void crown::PyWrapper::import_file(const char* name)
 
 void crown::PyWrapper::execute_string(const char* code)
 {
-	PyObject* py_code = Py_CompileString(code, "<string>", Py_single_input);
-	if (!py_code)
+	/// ±‡“Î≥ˆ¥Ì
+	/// “Ï≥£≤∂ªÒ
+	/// ±‡“ÎΩ·π˚
+
+	PyObject* py_code = Py_CompileString(code, "<string>", Py_file_input);
+	if (py_code)
 	{
+		PyObject* value = PyEval_EvalCode(py_code, _global, _local);
 		return;
 	}
-	PyObject* value = PyEval_EvalCode(py_code, PyEval_GetGlobals(), PyEval_GetLocals());
-	if (nullptr == value)
-		PyErr_Print();
+	else if (PyErr_ExceptionMatches(PyExc_SyntaxError))
+	{
+		char* msg, * line, * code = nullptr;
+		PyObject* exc, * val, * trb, * obj, * dum;
+		PyErr_Fetch(&exc, &val, &trb);        /* clears exception! */
+		if (PyArg_ParseTuple(val, "sO", &msg, &obj) &&
+			!strcmp(msg, "unexpected EOF while parsing")) /* E_EOF */
+		{
+			Py_XDECREF(exc);
+			Py_XDECREF(val);
+			Py_XDECREF(trb);
+		}
+		else                                   /* some other syntax error */
+		{
+			PyErr_Restore(exc, val, trb);
+			PyErr_Print();
+			free(code);
+			code = NULL;
+		}
+	}
+
 }
 
 void crown::PyWrapper::add_module_function(const char* module, const char* name, const char* func)

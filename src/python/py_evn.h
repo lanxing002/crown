@@ -7,7 +7,7 @@
 #include "device/types.h"
 #include "lua/lua_stack.h"
 #include "resource/types.h"
-//#include "Python.h"
+#include "Python.h"
 
 
 namespace crown
@@ -54,6 +54,10 @@ namespace crown
 
 		///
 		void register_console_commands(ConsoleServer& cs);
+
+	private:
+		PyObject* _local{ nullptr };
+		PyObject* _global{nullptr};
 	};
 
 } // namespace crown
