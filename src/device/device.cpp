@@ -252,6 +252,7 @@ Device::Device(const DeviceOptions &opts, ConsoleServer &cs)
 	, _input_manager(NULL)
 	, _unit_manager(NULL)
 	, _lua_environment(NULL)
+	, _py_wrapper(NULL)
 	, _pipeline(NULL)
 	, _display(NULL)
 	, _window(NULL)
@@ -558,8 +559,9 @@ void Device::run()
 
 	_input_manager    = CE_NEW(_allocator, InputManager)(default_allocator());
 	_unit_manager     = CE_NEW(_allocator, UnitManager)(default_allocator());
-	_lua_environment  = CE_NEW(_allocator, LuaEnvironment)();
-	//_lua_environment->register_console_commands(*_console_server);
+	_py_wrapper       = CE_NEW(_allocator, PyWrapper)();
+	_py_wrapper->init(_options._argv);
+	_py_wrapper->register_console_commands(*_console_server);
 
 	audio_globals::init();
 	physics_globals::init(_allocator);
@@ -568,10 +570,10 @@ void Device::run()
 	boot_package->load();
 	boot_package->flush();
 
-	//_lua_environment->load_libs();
-	//_lua_environment->require(_boot_config.boot_script_name.c_str());
-	//_lua_environment->execute_string(_options._lua_string.value().c_str());
+	_py_wrapper->import_file(_boot_config.boot_script_name.c_str());
+	_py_wrapper->execute_string(_options._lua_string.value().c_str());
 
+	auto cc = _boot_config.boot_script_name.c_str();
 	_pipeline = CE_NEW(_allocator, Pipeline)();
 	_pipeline->create(_width, _height);
 

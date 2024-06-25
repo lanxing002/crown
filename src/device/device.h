@@ -20,6 +20,7 @@
 #include "device/pipeline.h"
 #include "device/window.h"
 #include "lua/lua_environment.h"
+#include "python/py_evn.h"
 #include "resource/types.h"
 #include "resource/types.h"
 #include "world/types.h"
@@ -51,7 +52,8 @@ struct Device
 	MaterialManager *_material_manager;
 	InputManager *_input_manager;
 	UnitManager *_unit_manager;
-	LuaEnvironment *_lua_environment;
+	LuaEnvironment* _lua_environment;
+	PyWrapper *_py_wrapper;
 	Pipeline *_pipeline;
 	Display *_display;
 	Window *_window;
