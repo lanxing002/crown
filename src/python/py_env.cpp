@@ -18,6 +18,55 @@
 
 using namespace crown;
 
+/// <summary>
+/// redirect stdout stderr stdin
+/// </summary>
+PyObject* aview_write(PyObject* self, PyObject* args)
+{
+	const char* what;
+	if (!PyArg_ParseTuple(args, "s", &what))
+		return NULL;
+	printf("==%s==", what);
+	return Py_BuildValue("");
+}
+
+
+PyObject* aview_flush(PyObject* self, PyObject* args)
+{
+	return Py_BuildValue("");
+}
+
+
+PyMethodDef aview_methods[] =
+{
+	{"write", aview_write, METH_VARARGS, "doc for write"},
+	{"flush", aview_flush, METH_VARARGS, "doc for flush"},
+	{0, 0, 0, 0} // sentinel
+};
+
+
+PyModuleDef aview_module =
+{
+	PyModuleDef_HEAD_INIT, // PyModuleDef_Base m_base;
+	"aview",               // const char* m_name;
+	"doc for aview",       // const char* m_doc;
+	-1,                    // Py_ssize_t m_size;
+	aview_methods,        // PyMethodDef *m_methods
+	//  inquiry m_reload;  traverseproc m_traverse;  inquiry m_clear;  freefunc m_free;
+};
+
+PyMODINIT_FUNC PyInit_aview(void)
+{
+	PyObject* m = PyModule_Create(&aview_module);
+	PySys_SetObject("stdout", m);
+	PySys_SetObject("stderr", m);
+	return m;
+}
+
+
+/// end redirect
+
+
 crown::PyWrapper::PyWrapper()
 	:_random(0)
 {
@@ -48,12 +97,17 @@ void crown::PyWrapper::init(const char** argv)
 	config.use_environment = 0;
 	config.install_signal_handlers = 0;
 	config.safe_path = 0;
+
+	PyImport_AppendInittab("aview", PyInit_aview);
 	PyStatus status = Py_InitializeFromConfig(&config);
+	PyImport_ImportModule("aview");
 	CE_ASSERT(Py_IsInitialized(), "python initialization failed: %s\n", status.err_msg);
 
 	_local = PyDict_New();
 	_global = PyDict_New();
 	PyDict_SetItemString(_global, "__builtins__", PyEval_GetBuiltins());
+
+	execute_string(R"(print("sdads" * 12))");
 
 	PyConfig_Clear(&config);
 }

@@ -574,6 +574,7 @@ void Device::run()
 	_py_wrapper->import_file(_boot_config.boot_script_name.c_str());
 	_py_wrapper->execute_string(_options._lua_string.value().c_str());
 	_py_wrapper->execute_string("boot.boott()");
+	_py_wrapper->execute_string("1+ d");
 
 	auto cc = _boot_config.boot_script_name.c_str();
 	_pipeline = CE_NEW(_allocator, Pipeline)();
