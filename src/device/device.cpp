@@ -576,7 +576,7 @@ void Device::run()
 	_py_wrapper->run_string("print(globals().keys())");
 	_py_wrapper->run_string("print(locals().keys())");
 
-	_py_wrapper->invoke("test.a.tt", 121312313123);
+	_py_wrapper->invoke("boot.crown_test.a.tt", 121312313123);
 
 
 	auto cc = _boot_config.boot_script_name.c_str();

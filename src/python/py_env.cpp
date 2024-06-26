@@ -171,13 +171,15 @@ PyObject* crown::PyWrapper::query(const std::string& name)
 		{
 			std::string module_name = name.substr(start_pos, curr_pos - start_pos);
 			start_pos = curr_pos + 1;
+			curr_pos = name.find_first_of('.', start_pos);
 
 			if (nullptr == py_module)
 			{
 				py_module = PyDict_GetItemString(_global, module_name.c_str());
+				if (nullptr == py_module) break;
+				continue;
 			}
 
-			curr_pos = name.find_first_of('.', start_pos);
 			if (std::string::npos == curr_pos)
 			{
 				assert(py_module);
