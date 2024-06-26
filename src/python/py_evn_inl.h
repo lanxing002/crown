@@ -20,10 +20,11 @@ PyObject* create_pyobj(const Floating  val)
 
 
 template<typename Frist, typename...Rest>
-void pack_params_inl(std::vector<PyObject*>& objs, Frist p1, Rest... ps);
-
-template <>
-void pack_params_inl(std::vector<PyObject*>& objs, const char* param);
+void pack_params_inl(std::vector<PyObject*>& objs, Frist p1, Rest... ps)
+{
+	objs.push_back(create_pyobj(p1));
+	pack_params_inl(objs, ps...);
+}
 
 template <typename T>
 void pack_params_inl(std::vector<PyObject*>& objs, T param)
@@ -31,12 +32,9 @@ void pack_params_inl(std::vector<PyObject*>& objs, T param)
 	objs.push_back(create_pyobj(param));
 }
 
-template<typename Frist, typename...Rest>
-void pack_params_inl(std::vector<PyObject*>& objs, Frist p1, Rest... ps)
-{
-	objs.push_back(create_pyobj(p1));
-	pack_params_inl(objs, ps...);
-}
+template <>
+void pack_params_inl(std::vector<PyObject*>& objs, const char* param);
+
 
 template<typename ...Ts>
 void PyWrapper::invoke(const char* name, Ts...params)

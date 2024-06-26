@@ -104,8 +104,7 @@ void crown::PyWrapper::init(const char** argv)
 	PyImport_ImportModule("aview");
 	CE_ASSERT(Py_IsInitialized(), "python initialization failed: %s\n", status.err_msg);
 
-	_local = PyDict_New();
-	_global = PyDict_New();
+	_local = _global = PyDict_New();
 	PyDict_SetItemString(_global, "__builtins__", PyEval_GetBuiltins());
 
 	PyConfig_Clear(&config);
@@ -159,12 +158,42 @@ void crown::PyWrapper::run_string(const char* code)
 	}
 }
 
-PyObject* crown::PyWrapper::query(const char* name)
+PyObject* crown::PyWrapper::query(std::string name)
 {
-	assert(nullptr != name);
-	PyObject* func = PyDict_GetItemString(_local, name);
-	if (func == nullptr)
-		func = PyDict_GetItemString(_global, name);
+	size_t curr_pos = name.find_first_of('.');
+	PyObject* func = nullptr;
+	if (std::string::npos != curr_pos)
+	{
+		std::string func_name;
+		PyObject* py_module = nullptr;
+		size_t last_pos = 0;
+		while (true)
+		{
+			std::string module_name = name.substr(last_pos, curr_pos);
+			name = name.substr(curr_pos);
+			last_pos = curr_pos;
+
+			curr_pos = name.find_first_of('.', last_pos);
+			if (std::string::npos == curr_pos)
+			{
+				assert(py_module);
+				auto fun_name = name.substr(curr_pos);
+				func = PyObject_GetAttrString(py_module, fun_name.c_str());
+				break;
+			}
+			else
+			{
+				py_module = py_module == nullptr ? PyDict_GetItemString(_global, module_name.c_str())
+					: PyObject_GetAttrString(py_module, module_name.c_str());
+				if (nullptr == py_module)
+					break;
+			}
+		}
+	}
+	else  /// find in globals()
+	{
+		func = PyDict_GetItemString(_global, name.c_str());
+	}
 
 	if (func == nullptr)
 		logw(PY, "cannot found python function: %s", name);

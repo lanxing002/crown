@@ -577,7 +577,7 @@ void Device::run()
 	_py_wrapper->run_string("print(globals().keys())");
 	_py_wrapper->run_string("print(locals().keys())");
 
-	_py_wrapper->invoke("boot.pp", 12, 34.0, "dfsd");
+	_py_wrapper->invoke("boot.pp", 121312313123, 34.0, "dfsd");
 
 
 	auto cc = _boot_config.boot_script_name.c_str();
