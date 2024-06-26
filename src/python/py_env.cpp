@@ -113,9 +113,9 @@ void crown::PyWrapper::init(const char** argv)
 
 void crown::PyWrapper::append_sys_path(const char* path)
 {
-	execute_string("import sys");
+	run_string("import sys");
 	std::string p = std::string("sys.path.append(R\"") + path + "\")";
-	execute_string(p.c_str());
+	run_string(p.c_str());
 }
 
 void crown::PyWrapper::import_file(const char* name)
@@ -138,7 +138,7 @@ void crown::PyWrapper::import_file(const char* name)
 	return;
 }
 
-void crown::PyWrapper::execute_string(const char* code)
+void crown::PyWrapper::run_string(const char* code)
 {
 	/// reference 
 	/// https://docs.python.org/zh-cn/3.7/faq/extending.html
@@ -157,6 +157,18 @@ void crown::PyWrapper::execute_string(const char* code)
 	{
 		PyErr_Print();
 	}
+}
+
+PyObject* crown::PyWrapper::query(const char* name)
+{
+	assert(nullptr != name);
+	PyObject* func = PyDict_GetItemString(_local, name);
+	if (func == nullptr)
+		func = PyDict_GetItemString(_global, name);
+
+	if (func == nullptr)
+		logw(PY, "cannot found python function: %s", name);
+	return func;
 }
 
 void crown::PyWrapper::add_module_function(const char* module, const char* name, const char* func)
@@ -211,4 +223,10 @@ void crown::PyWrapper::register_console_commands(ConsoleServer& cs)
 {
 	cs.register_message_type("script", console_command_script, this);
 	cs.register_message_type("repl", console_command_REPL, this);
+}
+
+template <>
+void crown::pack_params_inl(std::vector<PyObject*>& objs, const char* param)
+{
+	objs.push_back(Py_BuildValue("s", param));
 }

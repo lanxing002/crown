@@ -41,7 +41,13 @@ namespace crown
 		void import_file(const char* name);
 
 		/// Executes the string.
-		void execute_string(const char* lua);
+		void run_string(const char* lua);
+
+		/// invoke python code from cpp
+		template<typename ...Ts>
+		void invoke(const char* name, Ts...params);
+
+		PyObject* query(const char* name);
 
 		/// Adds the function with the given @a name and @a func to the table @a module.
 		void add_module_function(const char* module, const char* name, const char* func);
@@ -62,3 +68,4 @@ namespace crown
 
 } // namespace crown
 
+#include "py_evn_inl.h"

@@ -572,10 +572,12 @@ void Device::run()
 
 	_py_wrapper->append_sys_path(_options._source_dir.value().c_str());
 	_py_wrapper->import_file(_boot_config.boot_script_name.c_str());
-	_py_wrapper->execute_string(_options._lua_string.value().c_str());
-	_py_wrapper->execute_string("boot.boott()");
-	_py_wrapper->execute_string("print(globals().keys())");
-	_py_wrapper->execute_string("print(locals().keys())");
+	_py_wrapper->run_string(_options._lua_string.value().c_str());
+	_py_wrapper->run_string("boot.boott()");
+	_py_wrapper->run_string("print(globals().keys())");
+	_py_wrapper->run_string("print(locals().keys())");
+
+	_py_wrapper->invoke("boot.pp", 12, 34.0, "dfsd");
 
 
 	auto cc = _boot_config.boot_script_name.c_str();
