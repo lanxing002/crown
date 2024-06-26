@@ -158,7 +158,7 @@ void crown::PyWrapper::run_string(const char* code)
 	}
 }
 
-PyObject* crown::PyWrapper::query(std::string name)
+PyObject* crown::PyWrapper::query(const std::string& name)
 {
 	size_t curr_pos = name.find_first_of('.');
 	PyObject* func = nullptr;
@@ -166,25 +166,28 @@ PyObject* crown::PyWrapper::query(std::string name)
 	{
 		std::string func_name;
 		PyObject* py_module = nullptr;
-		size_t last_pos = 0;
+		size_t start_pos = 0;
 		while (true)
 		{
-			std::string module_name = name.substr(last_pos, curr_pos);
-			name = name.substr(curr_pos);
-			last_pos = curr_pos;
+			std::string module_name = name.substr(start_pos, curr_pos - start_pos);
+			start_pos = curr_pos + 1;
 
-			curr_pos = name.find_first_of('.', last_pos);
+			if (nullptr == py_module)
+			{
+				py_module = PyDict_GetItemString(_global, module_name.c_str());
+			}
+
+			curr_pos = name.find_first_of('.', start_pos);
 			if (std::string::npos == curr_pos)
 			{
 				assert(py_module);
-				auto fun_name = name.substr(curr_pos);
+				auto fun_name = name.substr(start_pos);
 				func = PyObject_GetAttrString(py_module, fun_name.c_str());
 				break;
 			}
 			else
 			{
-				py_module = py_module == nullptr ? PyDict_GetItemString(_global, module_name.c_str())
-					: PyObject_GetAttrString(py_module, module_name.c_str());
+				py_module = PyObject_GetAttrString(py_module, module_name.c_str());
 				if (nullptr == py_module)
 					break;
 			}
