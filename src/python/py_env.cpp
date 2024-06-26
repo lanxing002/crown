@@ -17,7 +17,7 @@
 #include "Python.h"
 
 using namespace crown;
-
+LOG_SYSTEM(PY, "python");
 /// <summary>
 /// redirect stdout stderr stdin
 /// </summary>
@@ -26,7 +26,8 @@ PyObject* aview_write(PyObject* self, PyObject* args)
 	const char* what;
 	if (!PyArg_ParseTuple(args, "s", &what))
 		return NULL;
-	printf("==%s==", what);
+	//printf("==%s==", what);
+	printf("%s", what);
 	return Py_BuildValue("");
 }
 
@@ -107,8 +108,6 @@ void crown::PyWrapper::init(const char** argv)
 	_global = PyDict_New();
 	PyDict_SetItemString(_global, "__builtins__", PyEval_GetBuiltins());
 
-	execute_string(R"(print("sdads" * 12))");
-
 	PyConfig_Clear(&config);
 }
 
@@ -121,47 +120,43 @@ void crown::PyWrapper::append_sys_path(const char* path)
 
 void crown::PyWrapper::import_file(const char* name)
 {
+	//std::string code = "import " + std::string(name);
+	//execute_string(code.c_str());
 	PyObject* py_name = PyUnicode_DecodeFSDefault(name);
-	/* Error checking of pName left out */
-
 	PyObject* py_module = PyImport_Import(py_name);
+
 	if (nullptr == py_module)
+	{
 		PyErr_Print();
+		Py_DECREF(py_name);
+		return;
+	}
+
+	PyDict_SetItem(_global, py_name, py_module);
+	PyDict_SetItem(_local, py_name, py_module);
+	Py_DECREF(py_name);
+	return;
 }
 
 void crown::PyWrapper::execute_string(const char* code)
 {
-	/// 编译出错
-	/// 异常捕获
-	/// 编译结果
+	/// reference 
+	/// https://docs.python.org/zh-cn/3.7/faq/extending.html
 
 	PyObject* py_code = Py_CompileString(code, "<string>", Py_file_input);
-	if (py_code)
+	if (nullptr != py_code)
 	{
 		PyObject* value = PyEval_EvalCode(py_code, _global, _local);
+		Py_XDECREF(py_code);
+		Py_XDECREF(value);
+		if (PyErr_Occurred())
+			PyErr_Print();
 		return;
 	}
-	else if (PyErr_ExceptionMatches(PyExc_SyntaxError))
+	else/* if (PyErr_ExceptionMatches(PyExc_SyntaxError))*/ /// syntax error or E_EOF?
 	{
-		char* msg, * line, * code = nullptr;
-		PyObject* exc, * val, * trb, * obj, * dum;
-		PyErr_Fetch(&exc, &val, &trb);        /* clears exception! */
-		if (PyArg_ParseTuple(val, "sO", &msg, &obj) &&
-			!strcmp(msg, "unexpected EOF while parsing")) /* E_EOF */
-		{
-			Py_XDECREF(exc);
-			Py_XDECREF(val);
-			Py_XDECREF(trb);
-		}
-		else                                   /* some other syntax error */
-		{
-			PyErr_Restore(exc, val, trb);
-			PyErr_Print();
-			free(code);
-			code = NULL;
-		}
+		PyErr_Print();
 	}
-
 }
 
 void crown::PyWrapper::add_module_function(const char* module, const char* name, const char* func)
