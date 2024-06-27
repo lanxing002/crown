@@ -67,6 +67,8 @@
 #include <bx/error.h>
 #include <bx/file.h>
 #include <bx/math.h>
+#include <iostream>
+
 #if CROWN_PLATFORM_EMSCRIPTEN
 	#include <emscripten/emscripten.h>
 #endif
@@ -303,7 +305,6 @@ bool Device::process_events()
 
 	return exit;
 }
-
 bool Device::frame()
 {
 	if (CE_UNLIKELY(process_events() || _quit))
@@ -359,6 +360,13 @@ bool Device::frame()
 			_bgfx_callback->_screenshot_ready = 0;
 			_py_wrapper->invoke("boot.screenshot", dt);
 		}
+	}
+	while (true)
+	{
+		std::string in_code;
+		std::cout << ">>>";
+		std::getline(std::cin, in_code);
+		_py_wrapper->run_string(in_code.c_str());
 	}
 
 	_input_manager->update();

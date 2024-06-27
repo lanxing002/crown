@@ -18,6 +18,7 @@ function crown_project(_name, _kind, _defines)
 			CROWN_DIR .. "3rdparty/bullet3/src",
 			CROWN_DIR .. "3rdparty/openal/include",
 			CROWN_DIR .. "3rdparty/python/include",
+			CROWN_DIR .. "3rdparty/pybind11/include",
 		}
 
 		libdirs { CROWN_DIR .. "3rdparty/python/amd64" }

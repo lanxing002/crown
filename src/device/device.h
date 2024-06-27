@@ -26,6 +26,7 @@
 #include "world/types.h"
 #include <atomic>
 
+void ii();
 /// @defgroup Device Device
 namespace crown
 {

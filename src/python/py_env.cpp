@@ -99,6 +99,7 @@ void crown::PyWrapper::init(const char** argv)
 	config.install_signal_handlers = 0;
 	config.safe_path = 0;
 
+	ii();
 	PyImport_AppendInittab("aview", PyInit_aview);
 	PyStatus status = Py_InitializeFromConfig(&config);
 	PyImport_ImportModule("aview");
@@ -181,6 +182,7 @@ PyObject* crown::PyWrapper::query(const std::string& name)
 		PyObject* py_module = PyDict_GetItemString(_global, module_name.c_str());
 		if (nullptr != py_module)
 		{
+			Py_INCREF(py_module);
 			std::string func_name;
 			while (true)
 			{
@@ -191,17 +193,23 @@ PyObject* crown::PyWrapper::query(const std::string& name)
 				{
 					assert(py_module);
 					auto fun_name = name.substr(start_pos);
-					func = PyObject_GetAttrString(py_module, fun_name.c_str());
+					if (PyObject_HasAttrString(py_module, fun_name.c_str()))
+						func = PyObject_GetAttrString(py_module, fun_name.c_str());
 					break;
 				}
 				else
 				{
 					module_name = name.substr(start_pos, curr_pos - start_pos);
-					py_module = PyObject_GetAttrString(py_module, module_name.c_str());
+					if (PyObject_HasAttrString(py_module, module_name.c_str()))
+						py_module = PyObject_GetAttrString(py_module, module_name.c_str());
+					else
+						py_module = nullptr;
+
 					if (nullptr == py_module)
 						break;
 				}
 			}
+			Py_DECREF(py_module);
 		}
 	}
 	else  /// find in globals()
