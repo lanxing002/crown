@@ -348,29 +348,22 @@ bool Device::frame()
 		_resource_manager->complete_requests();
 
 		{
-			//const s64 t0 = time::now();
-			//LuaStack stack(_lua_environment->L);
-			//stack.push_float(dt);
-			//_lua_environment->call_global("update", 1);
-			//RECORD_FLOAT("lua.update", f32(time::seconds(time::now() - t0)));
+			const s64 t0 = time::now();
+			_py_wrapper->invoke("boot.update", dt);
+			RECORD_FLOAT("py.update", f32(time::seconds(time::now() - t0)));
 		}
 		{
-			//const s64 t0 = time::now();
-			//LuaStack stack(_lua_environment->L);
-			//stack.push_float(dt);
-			//_lua_environment->call_global("render", 1);
-			//RECORD_FLOAT("lua.render", f32(time::seconds(time::now() - t0)));
+			const s64 t0 = time::now();
+			_py_wrapper->invoke("boot.render", dt);
+			RECORD_FLOAT("py.render", f32(time::seconds(time::now() - t0)));
 		}
 
 		if (_bgfx_callback->_screenshot_ready) {
 			_bgfx_callback->_screenshot_ready = 0;
-			//LuaStack stack(_lua_environment->L);
-			//stack.push_string(_bgfx_callback->_screenshot_path.c_str());
-			//_lua_environment->call_global("screenshot", 1);
+			_py_wrapper->invoke("boot.screenshot", dt);
 		}
 	}
 
-	//_lua_environment->reset_temporaries();
 	_input_manager->update();
 
 	const bgfx::Stats *stats = bgfx::getStats();
@@ -572,12 +565,7 @@ void Device::run()
 
 	_py_wrapper->append_sys_path(_options._source_dir.value().c_str());
 	_py_wrapper->import_file(_boot_config.boot_script_name.c_str());
-	_py_wrapper->run_string(_options._lua_string.value().c_str());
-	_py_wrapper->run_string("print(globals().keys())");
-	_py_wrapper->run_string("print(locals().keys())");
-
-	_py_wrapper->invoke("boot.crown_test.a.tt", 121312313123);
-
+	_py_wrapper->run_string(_options._py_string.value().c_str());
 
 	auto cc = _boot_config.boot_script_name.c_str();
 	_pipeline = CE_NEW(_allocator, Pipeline)();
@@ -587,7 +575,7 @@ void Device::run()
 
 	logi(DEVICE, "Initialized in " TIME_FMT, time::seconds(time::now() - run_t0));
 
-	//_lua_environment->call_global("init");
+	_py_wrapper->invoke("boot.init");
 
 	_prev_width = _width;
 	_prev_height = _height;
@@ -599,7 +587,7 @@ void Device::run()
 	while (!frame()) { }
 #endif
 
-	//_lua_environment->call_global("shutdown");
+	_py_wrapper->invoke("boot.shutdown");
 
 	boot_package->unload();
 	destroy_resource_package(*boot_package);
@@ -610,8 +598,8 @@ void Device::run()
 
 	_pipeline->destroy();
 	CE_DELETE(_allocator, _pipeline);
-	CE_DELETE(_allocator, _lua_environment);
 	CE_DELETE(_allocator, _unit_manager);
+	CE_DELETE(_allocator, _py_wrapper);
 	CE_DELETE(_allocator, _input_manager);
 	CE_DELETE(_allocator, _resource_manager);
 	CE_DELETE(_allocator, _resource_loader);

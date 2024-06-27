@@ -26,7 +26,7 @@ struct DeviceOptions
 	Option<DynamicString> _bundle_dir;
 	Option<const char *> _boot_dir;
 	Option<const char *> _platform;
-	Option<DynamicString> _lua_string;
+	Option<DynamicString> _py_string;
 	Option<bool> _wait_console;
 	Option<bool> _do_compile;
 	Option<bool> _do_continue;

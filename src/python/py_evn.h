@@ -49,6 +49,8 @@ namespace crown
 		template<typename ...Ts>
 		void invoke(const char* name, Ts...params);
 
+		void invoke(const char* name);
+
 		PyObject* query(const std::string& name);
 
 		/// Adds the function with the given @a name and @a func to the table @a module.

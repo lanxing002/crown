@@ -159,6 +159,17 @@ void crown::PyWrapper::run_string(const char* code)
 	}
 }
 
+void crown::PyWrapper::invoke(const char* name)
+{
+	PyObject* func = query(name);
+	if (func)
+	{
+		PyObject* result = PyObject_CallObject(func, nullptr);
+		Py_XDECREF(result);
+		Py_XDECREF(func);
+	}
+}
+
 PyObject* crown::PyWrapper::query(const std::string& name)
 {
 	size_t start_pos = 0;
@@ -232,26 +243,26 @@ static void console_command_REPL(ConsoleServer& cs, u32 client_id, const char* j
 
 	//do_REPL((LuaEnvironment*)user_data, script.c_str());
 }
-
-static void do_REPL(LuaEnvironment* env, const char* lua)
-{
-	//lua_State* L = env->L;
-	//int status;
-
-	//lua_settop(L, 0);
-	//lua_pushstring(L, lua);
-	//if ((status = loadline(L)) != -1) { // This is never -1
-	//	if (status == LUA_OK) {
-	//		status = env->call(0, LUA_MULTRET);
-	//	}
-	//	if (status == LUA_OK)
-	//		l_print(L);
-	//	else
-	//		report(L, status);
-	//}
-	//lua_settop(L, 0); /* clear stack */
-	//return;
-}
+//
+//static void do_REPL(LuaEnvironment* env, const char* lua)
+//{
+//	//lua_State* L = env->L;
+//	//int status;
+//
+//	//lua_settop(L, 0);
+//	//lua_pushstring(L, lua);
+//	//if ((status = loadline(L)) != -1) { // This is never -1
+//	//	if (status == LUA_OK) {
+//	//		status = env->call(0, LUA_MULTRET);
+//	//	}
+//	//	if (status == LUA_OK)
+//	//		l_print(L);
+//	//	else
+//	//		report(L, status);
+//	//}
+//	//lua_settop(L, 0); /* clear stack */
+//	//return;
+//}
 
 void crown::PyWrapper::register_console_commands(ConsoleServer& cs)
 {

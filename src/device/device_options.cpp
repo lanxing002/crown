@@ -66,7 +66,7 @@ DeviceOptions::DeviceOptions(Allocator &a, int argc, const char **argv)
 	, _bundle_dir(DynamicString(a))
 	, _boot_dir(NULL)
 	, _platform(NULL)
-	, _lua_string(DynamicString(a))
+	, _py_string(DynamicString(a))
 	, _wait_console(false)
 	, _do_compile(false)
 	, _do_continue(false)
@@ -220,7 +220,7 @@ int DeviceOptions::parse(bool *quit)
 
 	const char *ls = cl.get_parameter(0, "lua-string");
 	if (ls)
-		_lua_string = ls;
+		_py_string = ls;
 
 	if (cl.has_option("string-id")) {
 		const char *string_id_bits = cl.get_parameter(0, "string-id");
