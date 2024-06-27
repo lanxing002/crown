@@ -18,7 +18,6 @@ PyObject* create_pyobj(const Floating  val)
 	return Py_BuildValue("d", val);
 }
 
-
 template<typename Frist, typename...Rest>
 void pack_params_inl(std::vector<PyObject*>& objs, Frist p1, Rest... ps)
 {
@@ -35,7 +34,6 @@ void pack_params_inl(std::vector<PyObject*>& objs, T param)
 template <>
 void pack_params_inl(std::vector<PyObject*>& objs, const char* param);
 
-
 template<typename ...Ts>
 void PyWrapper::invoke(const char* name, Ts...params)
 {
@@ -49,13 +47,13 @@ void PyWrapper::invoke(const char* name, Ts...params)
 	if (func)
 	{
 		PyObject* result = PyObject_CallObject(func, params);
-		Py_DECREF(params);
-		Py_XDECREF(func);
 		Py_XDECREF(result);
 
 		if (PyErr_Occurred())
 			PyErr_Print();
 	}
+	Py_XDECREF(func);
+	Py_XDECREF(params);
 }
 
 } // namespace crown

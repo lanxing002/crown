@@ -66,6 +66,7 @@ namespace crown
 	private:
 		PyObject* _local{ nullptr };
 		PyObject* _global{nullptr};
+		PyObject* _builtins{nullptr};
 	};
 
 } // namespace crown

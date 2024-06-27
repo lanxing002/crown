@@ -105,6 +105,7 @@ void crown::PyWrapper::init(const char** argv)
 	CE_ASSERT(Py_IsInitialized(), "python initialization failed: %s\n", status.err_msg);
 
 	_local = _global = PyDict_New();
+	_builtins = PyEval_GetBuiltins();
 	PyDict_SetItemString(_global, "__builtins__", PyEval_GetBuiltins());
 
 	PyConfig_Clear(&config);
@@ -160,44 +161,43 @@ void crown::PyWrapper::run_string(const char* code)
 
 PyObject* crown::PyWrapper::query(const std::string& name)
 {
+	size_t start_pos = 0;
 	size_t curr_pos = name.find_first_of('.');
 	PyObject* func = nullptr;
 	if (std::string::npos != curr_pos)
 	{
-		std::string func_name;
-		PyObject* py_module = nullptr;
-		size_t start_pos = 0;
-		while (true)
+		std::string module_name = name.substr(start_pos, curr_pos - start_pos);
+		PyObject* py_module = PyDict_GetItemString(_global, module_name.c_str());
+		if (nullptr != py_module)
 		{
-			std::string module_name = name.substr(start_pos, curr_pos - start_pos);
-			start_pos = curr_pos + 1;
-			curr_pos = name.find_first_of('.', start_pos);
+			std::string func_name;
+			while (true)
+			{
+				start_pos = curr_pos + 1;
+				curr_pos = name.find_first_of('.', start_pos);
 
-			if (nullptr == py_module)
-			{
-				py_module = PyDict_GetItemString(_global, module_name.c_str());
-				if (nullptr == py_module) break;
-				continue;
-			}
-
-			if (std::string::npos == curr_pos)
-			{
-				assert(py_module);
-				auto fun_name = name.substr(start_pos);
-				func = PyObject_GetAttrString(py_module, fun_name.c_str());
-				break;
-			}
-			else
-			{
-				py_module = PyObject_GetAttrString(py_module, module_name.c_str());
-				if (nullptr == py_module)
+				if (std::string::npos == curr_pos)
+				{
+					assert(py_module);
+					auto fun_name = name.substr(start_pos);
+					func = PyObject_GetAttrString(py_module, fun_name.c_str());
 					break;
+				}
+				else
+				{
+					module_name = name.substr(start_pos, curr_pos - start_pos);
+					py_module = PyObject_GetAttrString(py_module, module_name.c_str());
+					if (nullptr == py_module)
+						break;
+				}
 			}
 		}
 	}
 	else  /// find in globals()
 	{
 		func = PyDict_GetItemString(_global, name.c_str());
+		if (nullptr == func)
+			func = PyDict_GetItemString(_builtins, name.c_str());
 	}
 
 	if (func == nullptr)
