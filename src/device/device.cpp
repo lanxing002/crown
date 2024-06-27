@@ -36,8 +36,6 @@
 #include "device/log.h"
 #include "device/pipeline.h"
 #include "device/profiler.h"
-#include "lua/lua_environment.h"
-#include "lua/lua_stack.inl"
 #include "resource/config_resource.h"
 #include "resource/font_resource.h"
 #include "resource/level_resource.h"
@@ -251,7 +249,6 @@ Device::Device(const DeviceOptions &opts, ConsoleServer &cs)
 	, _material_manager(NULL)
 	, _input_manager(NULL)
 	, _unit_manager(NULL)
-	, _lua_environment(NULL)
 	, _py_wrapper(NULL)
 	, _pipeline(NULL)
 	, _display(NULL)
@@ -769,7 +766,7 @@ World *Device::create_world()
 		, *_shader_manager
 		, *_material_manager
 		, *_unit_manager
-		, *_lua_environment
+		, *_py_wrapper
 		);
 
 	list::add(world->_node, _worlds);

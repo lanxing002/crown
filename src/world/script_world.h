@@ -4,8 +4,7 @@
  */
 
 #include "core/containers/types.h"
-//#include "lua/types.h"
-#include "lua/lua_environment.h"
+#include "python/py_evn.h"
 #include "resource/types.h"
 #include "world/types.h"
 
@@ -35,13 +34,13 @@ struct ScriptWorld
 
 	UnitManager *_unit_manager;
 	ResourceManager *_resource_manager;
-	LuaEnvironment *_lua_environment;
+	PyWrapper *_py_wrapper;
 	World *_world;
 	UnitDestroyCallback _unit_destroy_callback;
 	bool _disable_callbacks;
 
 	///
-	ScriptWorld(Allocator &a, UnitManager &um, ResourceManager &rm, LuaEnvironment &le, World &w);
+	ScriptWorld(Allocator &a, UnitManager &um, ResourceManager &rm, PyWrapper &py, World &w);
 
 	///
 	~ScriptWorld();

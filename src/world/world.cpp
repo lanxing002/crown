@@ -31,13 +31,13 @@
 
 namespace crown
 {
-World::World(Allocator &a, ResourceManager &rm, ShaderManager &sm, MaterialManager &mm, UnitManager &um, LuaEnvironment &env)
+World::World(Allocator &a, ResourceManager &rm, ShaderManager &sm, MaterialManager &mm, UnitManager &um, PyWrapper &env)
 	: _marker(WORLD_MARKER)
 	, _allocator(&a)
 	, _resource_manager(&rm)
 	, _shader_manager(&sm)
 	, _material_manager(&mm)
-	, _lua_environment(&env)
+	, _py_wrapper(&env)
 	, _unit_manager(&um)
 	, _lines(NULL)
 	, _scene_graph(NULL)

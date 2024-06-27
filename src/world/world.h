@@ -9,7 +9,7 @@
 #include "core/math/types.h"
 #include "core/strings/string_id.h"
 #include "core/types.h"
-#include "lua/lua_environment.h"
+#include "python/py_evn.h"
 #include "resource/types.h"
 #include "world/event_stream.h"
 #include "world/gui.h"
@@ -48,7 +48,7 @@ struct World
 	ResourceManager *_resource_manager;
 	ShaderManager *_shader_manager;
 	MaterialManager *_material_manager;
-	LuaEnvironment *_lua_environment;
+	PyWrapper *_py_wrapper;
 	UnitManager *_unit_manager;
 
 	DebugLine *_lines;
@@ -77,7 +77,7 @@ struct World
 	}
 
 	///
-	World(Allocator &a, ResourceManager &rm, ShaderManager &sm, MaterialManager &mm, UnitManager &um, LuaEnvironment &env);
+	World(Allocator &a, ResourceManager &rm, ShaderManager &sm, MaterialManager &mm, UnitManager &um, PyWrapper &env);
 
 	///
 	~World();

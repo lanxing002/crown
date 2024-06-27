@@ -7,8 +7,6 @@
 #include "core/containers/hash_map.inl"
 #include "core/strings/string_id.inl"
 #include "device/device.h"
-//#include "lua/lua_environment.h"
-//#include "lua/lua_stack.inl"
 #include "resource/resource_manager.h"
 #include "world/script_world.h"
 #include "world/unit_manager.h"
@@ -210,7 +208,7 @@ namespace script_world
 
 } // namespace script_world
 
-ScriptWorld::ScriptWorld(Allocator &a, UnitManager &um, ResourceManager &rm, LuaEnvironment &le, World &w)
+ScriptWorld::ScriptWorld(Allocator &a, UnitManager &um, ResourceManager &rm, PyWrapper &py, World &w)
 	: _marker(SCRIPT_WORLD_MARKER)
 	, _script(a)
 	, _data(a)
@@ -218,7 +216,7 @@ ScriptWorld::ScriptWorld(Allocator &a, UnitManager &um, ResourceManager &rm, Lua
 	, _cache(a)
 	, _unit_manager(&um)
 	, _resource_manager(&rm)
-	, _lua_environment(&le)
+	, _py_wrapper(&py)
 	, _world(&w)
 	, _disable_callbacks(false)
 {

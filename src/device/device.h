@@ -52,7 +52,6 @@ struct Device
 	MaterialManager *_material_manager;
 	InputManager *_input_manager;
 	UnitManager *_unit_manager;
-	LuaEnvironment* _lua_environment;
 	PyWrapper *_py_wrapper;
 	Pipeline *_pipeline;
 	Display *_display;
