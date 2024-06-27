@@ -6,6 +6,7 @@
 #pragma once
 
 #include "core/types.h"
+#include <array>
 
 /// @defgroup Math Math
 /// @ingroup Core
@@ -49,8 +50,8 @@ struct Matrix4x4
 
 struct AABB
 {
-	Vector3 min;
-	Vector3 max;
+	Vector3 min{ 3.402823466e+38F , 3.402823466e+38F , 3.402823466e+38F };
+	Vector3 max{ 1.175494351e-38F , 1.175494351e-38F , 1.175494351e-38F };
 };
 
 struct OBB
@@ -70,7 +71,7 @@ struct Plane3
 
 struct Frustum
 {
-	Plane3 planes[6];
+	std::array<Plane3, 6> planes;
 };
 
 struct Sphere
