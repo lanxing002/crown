@@ -264,6 +264,10 @@ static void console_command_REPL(ConsoleServer& cs, u32 client_id, const char* j
 //	//return;
 //}
 
+void crown::PyWrapper::reload()
+{
+}
+
 void crown::PyWrapper::register_console_commands(ConsoleServer& cs)
 {
 	cs.register_message_type("script", console_command_script, this);

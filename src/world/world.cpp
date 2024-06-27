@@ -11,7 +11,6 @@
 #include "core/math/vector4.inl"
 #include "core/memory/temp_allocator.inl"
 #include "core/strings/string_id.inl"
-#include "lua/lua_environment.h"
 #include "resource/resource_manager.h"
 #include "resource/unit_resource.h"
 #include "world/animation_state_machine.h"

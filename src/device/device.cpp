@@ -798,7 +798,7 @@ void Device::refresh(const char *json)
 	DynamicString type(ta);
 	sjson::parse(obj, json);
 
-	bool refresh_lua = false;
+	bool refresh_py = false;
 	sjson::parse_array(list, obj["list"]);
 	for (u32 i = 0; i < array::size(list); ++i) {
 		DynamicString resource(ta);
@@ -814,15 +814,15 @@ void Device::refresh(const char *json)
 		_resource_manager->reload(resource_type, resource_name);
 
 		if (resource_type == RESOURCE_TYPE_SCRIPT) {
-			refresh_lua = true;
+			refresh_py = true;
 		}
 	}
 
 	if (!array::size(list)) {
 		logi(DEVICE, "Nothing to refresh");
 	} else {
-		//if (refresh_lua);
-			//_lua_environment->reload();
+		if (refresh_py)
+			_py_wrapper->reload();
 	}
 
 	if (_paused)
