@@ -8,7 +8,13 @@ PYBIND11_MODULE(example, m) {
 	m.def("add", &add, "A function that adds two numbers");
 }
 
+
+PYBIND11_MODULE(e33, m) {
+	m.doc() = "pybind11 example33 plugin"; // optional module docstring
+	m.def("add", &add, "A function that adds two numbers");
+}
+
 void ii()
 {
-	PyImport_AppendInittab("example", PyInit_example);
+	PyImport_AppendInittab("e33", PyInit_e33);
 }
