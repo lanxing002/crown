@@ -8,6 +8,8 @@
 #ifndef FMT_BASE_H_
 #define FMT_BASE_H_
 
+#define FMT_HEADER_ONLY
+
 #if defined(FMT_IMPORT_STD) && !defined(FMT_MODULE)
 #  define FMT_MODULE
 #endif
@@ -288,7 +290,7 @@
 #endif
 
 #ifndef FMT_UNICODE
-#  define FMT_UNICODE 1
+#  define FMT_UNICODE 0
 #endif
 
 // Check if rtti is available.
