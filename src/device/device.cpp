@@ -30,12 +30,14 @@
 #include "core/types.h"
 #include "device/console_server.h"
 #include "device/device.h"
+#include "device/eval_expression.h"
 #include "device/graph.h"
 #include "device/input_device.h"
 #include "device/input_manager.h"
 #include "device/log.h"
 #include "device/pipeline.h"
 #include "device/profiler.h"
+//#include 
 #include "resource/config_resource.h"
 #include "resource/font_resource.h"
 #include "resource/level_resource.h"
@@ -68,6 +70,7 @@
 #include <bx/file.h>
 #include <bx/math.h>
 #include <iostream>
+#include <thread>
 
 #if CROWN_PLATFORM_EMSCRIPTEN
 	#include <emscripten/emscripten.h>
@@ -361,13 +364,14 @@ bool Device::frame()
 			_py_wrapper->invoke("boot.screenshot", dt);
 		}
 	}
-	while (true)
-	{
-		std::string in_code;
-		std::cout << ">>>";
-		std::getline(std::cin, in_code);
-		_py_wrapper->run_string(in_code.c_str());
-	}
+
+	//while (true)
+	//{
+	//	std::string in_code;
+	//	std::cout << ">>>";
+	//	std::getline(std::cin, in_code);
+	//	_py_wrapper->run_string(in_code.c_str());
+	//}
 
 	_input_manager->update();
 
@@ -571,6 +575,7 @@ void Device::run()
 	_py_wrapper->append_sys_path(_options._source_dir.value().c_str());
 	_py_wrapper->import_file(_boot_config.boot_script_name.c_str());
 	_py_wrapper->run_string(_options._py_string.value().c_str());
+	std::thread eval_code_t(EvalExpr::eval, _py_wrapper);
 
 	auto cc = _boot_config.boot_script_name.c_str();
 	_pipeline = CE_NEW(_allocator, Pipeline)();
@@ -593,7 +598,8 @@ void Device::run()
 #endif
 
 	_py_wrapper->invoke("boot.shutdown");
-
+	EvalExpr::quit = true;
+	eval_code_t.join();
 	boot_package->unload();
 	destroy_resource_package(*boot_package);
 

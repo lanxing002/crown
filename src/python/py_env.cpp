@@ -166,6 +166,9 @@ void crown::PyWrapper::invoke(const char* name)
 	if (func)
 	{
 		PyObject* result = PyObject_CallObject(func, nullptr);
+		if (PyErr_Occurred())
+			PyErr_Print();
+
 		Py_XDECREF(result);
 		Py_XDECREF(func);
 	}
