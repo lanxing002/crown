@@ -666,7 +666,6 @@ def _init_config_vars():
     if os.name == 'nt':
         _init_non_posix(_CONFIG_VARS)
         _CONFIG_VARS['VPATH'] = sys._vpath
-        _CONFIG_VARS['TZPATH'] = os.path.join(_PREFIX, "share", "zoneinfo")
     if os.name == 'posix':
         _init_posix(_CONFIG_VARS)
     if _HAS_USER_BASE:

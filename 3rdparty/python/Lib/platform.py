@@ -1068,7 +1068,7 @@ def _sys_version(sys_version=None):
         return result
 
     sys_version_parser = re.compile(
-        r'([\w.+]+)\s*(?:\ \|\ packaged\ by\ Anaconda,\ Inc\.\ \|)?\s*'
+        r'([\w.+]+)\s*'  # "version<space>"
         r'\(#?([^,]+)'  # "(#buildno"
         r'(?:,\s*([\w ]*)'  # ", builddate"
         r'(?:,\s*([\w :]*))?)?\)\s*'  # ", buildtime)<space>"
