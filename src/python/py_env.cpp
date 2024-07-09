@@ -285,6 +285,16 @@ void crown::PyWrapper::register_console_commands(ConsoleServer& cs)
 	cs.register_message_type("repl", console_command_REPL, this);
 }
 
+void crown::PyWrapper::generate_stub(const std::string& outdir)
+{
+	std::string code = R"(
+import pybind11_stubgen as _pybind11_stubgen 
+args = ['-o', './stub','crown']
+_pybind11_stubgen.main(args)
+)";
+	run_string(code.c_str());
+}
+
 template <>
 void crown::pack_params_inl(std::vector<PyObject*>& objs, const char* param)
 {

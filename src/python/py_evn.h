@@ -65,6 +65,8 @@ namespace crown
 		///
 		void register_console_commands(ConsoleServer& cs);
 
+		void generate_stub(const std::string& outdir);
+
 	private:
 		PyObject* _local{ nullptr };
 		PyObject* _global{nullptr};

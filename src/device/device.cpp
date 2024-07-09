@@ -365,13 +365,13 @@ bool Device::frame()
 		}
 	}
 
-	//while (true)
-	//{
-	//	std::string in_code;
-	//	std::cout << ">>>";
-	//	std::getline(std::cin, in_code);
-	//	_py_wrapper->run_string(in_code.c_str());
-	//}
+	while (true)
+	{
+		std::string in_code;
+		std::cout << ">>>";
+		std::getline(std::cin, in_code);
+		_py_wrapper->run_string(in_code.c_str());
+	}
 
 	_input_manager->update();
 

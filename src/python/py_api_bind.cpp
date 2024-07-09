@@ -27,6 +27,7 @@
 #include "world/render_world.h"
 #include "world/scene_graph.h"
 #include "world/sound_world.h"
+#include "world/types.h"
 #include "world/unit_manager.h"
 #include "world/world.h"
 
@@ -73,14 +74,9 @@ auto format_as(const Quaternion& q)
 	return fmt::format("Quaternion(x:{}, y:{}, z:{}, w:{})", q.x, q.y, q.z, q.w);
 }
 
-auto format_as(const Matrix3x3& m)
-{
-	return fmt::format("Matrix3x3(x:{}, y:{}, z:{})", m.x, m.y, m.z);
-}
-
 auto format_as(const Matrix4x4& m)
 {
-	return fmt::format("Matrix3x3(x:{}, y:{}, z:{}, t:{})", m.x, m.y, m.z, m.t);
+	return fmt::format("Matrix4x4(x:{}, y:{}, z:{}, t:{})", m.x, m.y, m.z, m.t);
 }
 
 auto format_as(const AABB& a)
@@ -425,13 +421,6 @@ void init_base(py::module& m)
 		.def_readwrite("sound_type", &SoundResource::sound_type)
 		;
 
-	py::class_<InputEvent>(m, "InputEvent")
-		.def_readwrite("id", &InputEvent::id)
-		.def_readwrite("type", &InputEvent::type)
-		.def_readwrite("value", &InputEvent::value)
-		//.def_readwrite("device", &InputEvent::device)
-		;
-
 	py::enum_<InputEventType::Enum>(m, "InputEventType")
 		.value("BUTTON_PRESSED", InputEventType::Enum::BUTTON_PRESSED)
 		.value("BUTTON_RELEASED", InputEventType::Enum::BUTTON_RELEASED)
@@ -439,6 +428,47 @@ void init_base(py::module& m)
 		.value("COUNT", InputEventType::Enum::COUNT)
 		.export_values()
 		;
+
+	py::class_<InputEvent>(m, "InputEvent")
+		.def_readwrite("id", &InputEvent::id)
+		.def_readwrite("type", &InputEvent::type)
+		.def_readwrite("value", &InputEvent::value)
+		//.def_readwrite("device", &InputEvent::device)
+		;
+
+	py::enum_<LightType::Enum>(m, "LightTypeType")
+		.value("DIRECTIONAL", LightType::Enum::DIRECTIONAL)
+		.value("OMNI", LightType::Enum::OMNI)
+		.value("SPOT", LightType::Enum::SPOT)
+		.export_values();
+
+	py::enum_<MouseCursor::Enum>(m, "MouseCursorType")
+		.value("ARROW", MouseCursor::Enum::ARROW)
+		.value("TEXT_INPUT", MouseCursor::Enum::TEXT_INPUT)
+		.value("CORNER_TOP_LEFT", MouseCursor::Enum::CORNER_TOP_LEFT)
+		.value("CORNER_TOP_RIGHT", MouseCursor::Enum::CORNER_TOP_RIGHT)
+		.value("CORNER_BOTTOM_LEFT", MouseCursor::Enum::CORNER_BOTTOM_LEFT)
+		.value("CORNER_BOTTOM_RIGHT", MouseCursor::Enum::CORNER_BOTTOM_RIGHT)
+		.value("SIZE_HORIZONTAL", MouseCursor::Enum::SIZE_HORIZONTAL)
+		.value("SIZE_VERTICAL", MouseCursor::Enum::SIZE_VERTICAL)
+		.value("WAIT", MouseCursor::Enum::WAIT)
+		.export_values();
+
+	py::enum_<CursorMode::Enum>(m, "CursorMode")
+		.value("NORMAL", CursorMode::NORMAL)
+		.value("DISABLED", CursorMode::DISABLED)
+		.export_values();
+
+	py::enum_<ProjectionType::Enum>(m, "ProjectionType")
+		.value("PERSPECTIVE", ProjectionType::PERSPECTIVE)
+		.value("ORTHOGRAPHIC", ProjectionType::ORTHOGRAPHIC)
+		.export_values();
+
+	py::enum_<DeadzoneMode::Enum>(m, "DeadzoneMode")
+		.value("RAW", DeadzoneMode::RAW)
+		.value("INDEPENDENT", DeadzoneMode::INDEPENDENT)
+		.value("CIRCULAR", DeadzoneMode::CIRCULAR)
+		.export_values();
 }
 
 void init_math_module(py::module& m)
@@ -516,11 +546,8 @@ void init_math_module(py::module& m)
 	m.def("from_quaternion_translation", from_quaternion_translation);
 	m.def("from_quaternion", [](const Quaternion& r) {return from_quaternion_translation(r, VECTOR3_ZERO); });
 	m.def("from_translation", from_translation);
-	m.def("from_axes", py::overload_cast<const Vector3&, const Vector3&, const Vector3&>(from_axes));
 	m.def("from_axes", py::overload_cast<const Vector3&, const Vector3&, const Vector3&, const Vector3&>(from_axes));
-	m.def("transpose", py::overload_cast<Matrix3x3&>(transpose));
 	m.def("transpose", py::overload_cast<Matrix4x4&>(transpose));
-	m.def("invert", py::overload_cast<Matrix3x3&>(invert));
 	m.def("invert", py::overload_cast<Matrix4x4&>(invert));
 }
 
@@ -546,11 +573,38 @@ struct  ProDemo
 	Vector3 get() { return v; }
 };
 
+#ifdef DemoTest
 ProDemo g_;
 ProDemo* pg_ = new ProDemo();
+#endif // DemoTest
 
 void init_world(py::module& m)
 {
+	auto world_ = py::class_<World>(m, "World");
+	auto level_ = py::class_<Level>(m, "Level");
+
+#define BIND_INSTANCE_ID(inst_name) \
+	py::class_<inst_name>(m, #inst_name)	\
+		.def(py::init<>())			\
+		.def(py::init<u32>())		\
+		.def("is_valid", [](const inst_name& inst){return inst.i != UINT32_MAX;})		\
+		;
+	;
+
+	BIND_INSTANCE_ID(TransformInstance)
+	BIND_INSTANCE_ID(CameraInstance)
+	BIND_INSTANCE_ID(MeshInstance)
+	BIND_INSTANCE_ID(SpriteInstance)
+	BIND_INSTANCE_ID(LightInstance)
+	BIND_INSTANCE_ID(ColliderInstance)
+	BIND_INSTANCE_ID(ActorInstance)
+	BIND_INSTANCE_ID(JointInstance)
+	BIND_INSTANCE_ID(ScriptInstance)
+	BIND_INSTANCE_ID(StateMachineInstance)
+
+#undef BIND_INSTANCE_ID
+
+#ifdef DemoTest
 	py::class_<ProDemo>(m, "ProDemo")
 		.def(py::init<>())
 		.def_readwrite("vec3", &ProDemo::vec3)
@@ -561,56 +615,157 @@ void init_world(py::module& m)
 		.def_static("get_pg_ref", []() {return pg_; }, py::return_value_policy::reference)
 	//	.def_static("get_pg",[]() {return pg_; })
 		;
+#endif	
+
+	// level 中间结构体
+	py::class_<LevelResource>(m, "LevelResource")
+		.def(py::init<>([]()
+			{
+				assert(false && "should not construct LevelResource in py");
+				return LevelResource();
+			}))
+		;
+
+		py::class_<ResourcePackage>(m, "ResourcePackage")
+		.def("load", &ResourcePackage::load)
+		.def("unload", &ResourcePackage::unload)
+		.def("flush", &ResourcePackage::flush)
+		.def("has_loaded", &ResourcePackage::has_loaded)
+		;
+
+	py::class_<Material>(m, "Material")
+		.def("set_float", &Material::set_float)
+		.def("set_vector2", &Material::set_vector2)
+		.def("set_vector3", &Material::set_vector3)
+		.def("set_vector4", &Material::set_vector4)
+		.def("set_matrix4x4", &Material::set_matrix4x4)
+		;
+
+	py::class_<Gui>(m, "Gui")
+		.def("move", &Gui::move)
+		.def("triangle", &Gui::triangle)
+		.def("rect", &Gui::rect)
+		.def("image", &Gui::image)
+		.def("image_uv", &Gui::image_uv)
+		.def("text", &Gui::text)
+		.def("text", &Gui::text)
+		;
+
+	py::class_<UnitManager>(m, "UnitManager")
+		.def("create", py::overload_cast<World&>(&UnitManager::create))
+		.def("create", py::overload_cast<>(&UnitManager::create))
+		.def("alive", &UnitManager::alive)
+		;
+
+	py::class_<RaycastHit>(m, "RaycastHit")
+		.def(py::init<>())
+		.def_readwrite("position", &RaycastHit::position)
+		.def_readwrite("normal", &RaycastHit::normal)
+		.def_readwrite("time", &RaycastHit::time)
+		.def_readwrite("unit", &RaycastHit::unit)
+		.def_readwrite("actor", &RaycastHit::actor)
+		;
 
 
-	py::class_<World>(m, "World")
-		//.def("spawn_unit", &World::spawn_unit,
-		//	py::arg("pos") = py::cast(VECTOR3_ZERO),
-		//	py::arg("rot") = py::cast(QUATERNION_IDENTITY),
-		//	py::arg("scl") = py::cast(VECTOR3_ONE))
-		.def("spawn_unit", [](World& world, StringId64 name) { world.spawn_unit(name); })
-		.def("spawn_empty_unit", &World::spawn_empty_unit)
-		.def("destroy_unit", &World::destroy_unit)
-		.def("num_units", &World::num_units)
-		.def("spawn_unit", &World::spawn_unit)
-		.def("unit_by_name", &World::unit_by_name)
-		.def("camera_create", &World::camera_create)
-		.def("camera_destroy", &World::camera_destroy)
-		.def("camera_instance", &World::camera_instance)
-		.def("camera_set_projection_type", &World::camera_set_projection_type)
-		.def("camera_projection_type", &World::camera_projection_type)
-		.def("camera_fov", &World::camera_fov)
-		.def("camera_set_fov", &World::camera_set_fov)
-		.def("camera_near_clip_distance", &World::camera_near_clip_distance)
-		.def("camera_set_near_clip_distance", &World::camera_set_near_clip_distance)
-		.def("camera_far_clip_distance", &World::camera_far_clip_distance)
-		.def("camera_set_orthographic_size", &World::camera_set_orthographic_size)
-		.def("camera_screen_to_world", &World::camera_screen_to_world)
-		.def("camera_world_to_screen", &World::camera_world_to_screen)
-		.def("update_animations", &World::update_animations)
-		.def("update_scene", &World::update_scene)
-		.def("update", &World::update)
-		.def("play_sound", py::overload_cast<const SoundResource&, const bool, const f32, const Vector3&, const f32>(&World::play_sound))
-		.def("play_sound", py::overload_cast<StringId64, const bool, const f32, const Vector3&, const f32>(&World::play_sound))
-		.def("stop_sound", &World::stop_sound)
-		.def("link_sound", &World::link_sound)
-		.def("set_listener_pose", &World::set_listener_pose)
-		.def("set_sound_range", &World::set_sound_range)
-		.def("set_sound_volume", &World::set_sound_volume)
-		.def("create_debug_line", &World::create_debug_line)
-		.def("destroy_debug_line", &World::destroy_debug_line)
-		.def("create_screen_gui", &World::create_screen_gui)
-		.def("destroy_gui", &World::destroy_gui)
-		.def("load_level", &World::load_level)
-		.def_readwrite("scene_graph", &World::_scene_graph)
-		//.def_property_readonly("scene_graph",
-		//	py::cpp_function([](const World& world) {return world._scene_graph; }, py::return_value_policy::reference));
-		.def_readwrite("render_world", &World::_render_world)
-		.def_readwrite("physics_world", &World::_physics_world)
-		.def_readwrite("_sound_world", &World::_sound_world)
-		.def_readwrite("animation_state_machine", &World::_animation_state_machine)
-		.def("disable_unit_callbacks", &World::disable_unit_callbacks)
-		.def_readwrite("scene_graph", &World::_scene_graph)
+	py::class_<CameraDesc>(m, "CameraDesc")
+		.def(py::init<>())
+		.def_readwrite("type", &CameraDesc::type)
+		.def_readwrite("fov", &CameraDesc::fov)
+		.def_readwrite("near_range", &CameraDesc::near_range)
+		.def_readwrite("far_range", &CameraDesc::far_range)
+		;
+
+	py::class_<JointDesc>(m, "JointDesc")
+		.def(py::init<>())
+		.def_readwrite("type", &JointDesc::type)
+		.def_readwrite("anchor_0", &JointDesc::anchor_0)
+		.def_readwrite("anchor_1", &JointDesc::anchor_1)
+		.def_readwrite("breakable", &JointDesc::breakable)
+		;
+
+	py::class_<LightDesc>(m, "LightDesc")
+		.def(py::init<>())
+		.def_readwrite("type", &LightDesc::type)
+		.def_readwrite("range", &LightDesc::range)
+		.def_readwrite("intensity", &LightDesc::intensity)
+		.def_readwrite("spot_angle", &LightDesc::spot_angle)
+		.def_readwrite("color", &LightDesc::color)
+		;
+
+	py::class_<SpriteRendererDesc>(m, "SpriteRendererDesc")
+		.def(py::init<>())
+		.def_readwrite("sprite_resource", &SpriteRendererDesc::sprite_resource)
+		.def_readwrite("material_resource", &SpriteRendererDesc::material_resource)
+		.def_readwrite("layer", &SpriteRendererDesc::layer)
+		.def_readwrite("depth", &SpriteRendererDesc::depth)
+		.def_readwrite("visible", &SpriteRendererDesc::visible)
+		;
+
+	py::class_<MeshRendererDesc>(m, "MeshRendererDesc")
+		.def(py::init<>())
+		.def_readwrite("mesh_resource", &MeshRendererDesc::mesh_resource)
+		.def_readwrite("material_resource", &MeshRendererDesc::material_resource)
+		.def_readwrite("geometry_name", &MeshRendererDesc::geometry_name)
+		.def_readwrite("visible", &MeshRendererDesc::visible)
+		;
+
+	py::class_<PhysicsWorld>(m, "PhysicsWorld")
+		.def("actor", &PhysicsWorld::actor)
+		.def("actor_destroy", &PhysicsWorld::actor_destroy)
+		.def("actor_world_position", &PhysicsWorld::actor_world_position)
+		.def("actor_world_rotation", &PhysicsWorld::actor_world_rotation)
+		.def("actor_world_pose", &PhysicsWorld::actor_world_pose)
+		.def("actor_teleport_world_position", &PhysicsWorld::actor_teleport_world_position)
+		.def("actor_teleport_world_rotation", &PhysicsWorld::actor_teleport_world_rotation)
+		.def("actor_teleport_world_pose", &PhysicsWorld::actor_teleport_world_pose)
+		.def("actor_center_of_mass", &PhysicsWorld::actor_center_of_mass)
+		.def("actor_enable_gravity", &PhysicsWorld::actor_enable_gravity)
+		.def("actor_disable_gravity", &PhysicsWorld::actor_disable_gravity)
+		.def("actor_enable_collision", &PhysicsWorld::actor_enable_collision)
+		.def("actor_disable_collision", &PhysicsWorld::actor_disable_collision)
+		.def("actor_set_collision_filter", &PhysicsWorld::actor_set_collision_filter)
+		.def("actor_set_kinematic", &PhysicsWorld::actor_set_kinematic)
+		.def("actor_is_static", &PhysicsWorld::actor_is_static)
+		.def("actor_is_dynamic", &PhysicsWorld::actor_is_dynamic)
+		.def("actor_is_kinematic", &PhysicsWorld::actor_is_kinematic)
+		.def("actor_is_nonkinematic", &PhysicsWorld::actor_is_nonkinematic)
+		.def("actor_linear_damping", &PhysicsWorld::actor_linear_damping)
+		.def("actor_set_linear_damping", &PhysicsWorld::actor_set_linear_damping)
+		.def("actor_angular_damping", &PhysicsWorld::actor_angular_damping)
+		.def("actor_linear_velocity", &PhysicsWorld::actor_linear_velocity)
+		.def("actor_set_linear_velocity", &PhysicsWorld::actor_set_linear_velocity)
+		.def("actor_angular_velocity", &PhysicsWorld::actor_angular_velocity)
+		.def("actor_set_angular_velocity", &PhysicsWorld::actor_set_angular_velocity)
+		.def("actor_add_impulse", &PhysicsWorld::actor_add_impulse)
+		.def("actor_add_impulse_at", &PhysicsWorld::actor_add_impulse_at)
+		.def("actor_add_torque_impulse", &PhysicsWorld::actor_add_torque_impulse)
+		.def("actor_push", &PhysicsWorld::actor_push)
+		.def("actor_push_at", &PhysicsWorld::actor_push_at)
+		.def("actor_is_sleeping", &PhysicsWorld::actor_is_sleeping)
+		.def("actor_wake_up", &PhysicsWorld::actor_wake_up)
+		.def("joint_create", &PhysicsWorld::joint_create)
+		.def("gravity", &PhysicsWorld::gravity)
+		.def("set_gravity", &PhysicsWorld::set_gravity)
+		//.def("cast_ray_all", [](PhysicsWorld& pw, Array<RaycastHit>& hits, const Vector3& from, const Vector3& dir, f32 le) {})
+		.def("cast_sphere", &PhysicsWorld::cast_sphere)
+		.def("cast_box", &PhysicsWorld::cast_box)
+		.def("enable_debug_drawing", &PhysicsWorld::enable_debug_drawing)
+		;
+
+	py::class_<SoundWorld>(m, "SoundWorld")
+		.def("stop_all", &SoundWorld::stop_all)
+		.def("pause_all", &SoundWorld::pause_all)
+		.def("resume_all", &SoundWorld::resume_all)
+		.def("is_playing", &SoundWorld::is_playing)
+		.def("pause_all", &SoundWorld::pause_all)
+		;
+
+	py::class_<AnimationStateMachine>(m, "AnimationStateMachine")
+		.def("instance", &AnimationStateMachine::instance)
+		.def("trigger", &AnimationStateMachine::trigger)
+		.def("variable_id", &AnimationStateMachine::variable_id)
+		.def("variable", &AnimationStateMachine::variable)
+		.def("set_variable", &AnimationStateMachine::set_variable)
 		;
 
 	py::class_<SceneGraph>(m, "SceneGraph")
@@ -633,10 +788,17 @@ void init_world(py::module& m)
 		.def("unlink", &SceneGraph::unlink)
 		;
 
-	py::class_<UnitManager>(m, "UnitManager")
-		.def("create", py::overload_cast<World&>(&UnitManager::create))
-		.def("create", py::overload_cast<>(&UnitManager::create))
-		.def("alive", &UnitManager::alive)
+	py::class_<DebugLine>(m, "DebugLine")
+		.def("add_line", &DebugLine::add_line)
+		.def("add_axes", &DebugLine::add_axes)
+		.def("add_arc", &DebugLine::add_arc)
+		.def("add_circle", &DebugLine::add_circle)
+		.def("add_cone", &DebugLine::add_cone)
+		.def("add_sphere", &DebugLine::add_sphere)
+		.def("add_obb", &DebugLine::add_obb)
+		.def("add_frustum", &DebugLine::add_frustum)
+		.def("reset", &DebugLine::reset)
+		.def("submit", &DebugLine::submit)
 		;
 
 	py::class_<RenderWorld>(m, "RenderWorld")
@@ -679,67 +841,60 @@ void init_world(py::module& m)
 		.def("enable_debug_drawing", &RenderWorld::enable_debug_drawing)
 		.def("selection", [](RenderWorld& world, UnitId unit, bool b_insert)
 			{ b_insert ? hash_set::insert(world._selection, unit)
-				: hash_set::remove(world._selection, unit); })
+			: hash_set::remove(world._selection, unit); })
 		;
 
-	py::class_<PhysicsWorld>(m, "PhysicsWorld")
-		.def("actor", &PhysicsWorld::actor)
-		.def("actor_destroy", &PhysicsWorld::actor_destroy)
-		.def("actor_world_position", &PhysicsWorld::actor_world_position)
-		.def("actor_world_rotation", &PhysicsWorld::actor_world_rotation)
-		.def("actor_world_pose", &PhysicsWorld::actor_world_pose)
-		.def("actor_teleport_world_position", &PhysicsWorld::actor_teleport_world_position)
-		.def("actor_teleport_world_rotation", &PhysicsWorld::actor_teleport_world_rotation)
-		.def("actor_teleport_world_pose", &PhysicsWorld::actor_teleport_world_pose)
-		.def("actor_center_of_mass", &PhysicsWorld::actor_center_of_mass)
-		.def("actor_enable_gravity", &PhysicsWorld::actor_enable_gravity)
-		.def("actor_disable_gravity", &PhysicsWorld::actor_disable_gravity)
-		.def("actor_enable_collision", &PhysicsWorld::actor_enable_collision)
-		.def("actor_disable_collision", &PhysicsWorld::actor_disable_collision)
-		.def("actor_set_collision_filter", &PhysicsWorld::actor_set_collision_filter)
-		.def("actor_set_kinematic", &PhysicsWorld::actor_set_kinematic)
-		.def("actor_is_static", &PhysicsWorld::actor_is_static)
-		.def("actor_is_dynamic", &PhysicsWorld::actor_is_dynamic)
-		.def("actor_is_kinematic", &PhysicsWorld::actor_is_kinematic)
-		.def("actor_is_nonkinematic", &PhysicsWorld::actor_is_nonkinematic)
-		.def("actor_linear_damping", &PhysicsWorld::actor_linear_damping)
-		.def("actor_set_linear_damping", &PhysicsWorld::actor_set_linear_damping)
-		.def("actor_angular_damping", &PhysicsWorld::actor_angular_damping)
-		.def("actor_linear_velocity", &PhysicsWorld::actor_linear_velocity)
-		.def("actor_set_linear_velocity", &PhysicsWorld::actor_set_linear_velocity)
-		.def("actor_angular_velocity", &PhysicsWorld::actor_angular_velocity)
-		.def("actor_set_angular_velocity", &PhysicsWorld::actor_set_angular_velocity)
-		.def("actor_add_impulse", &PhysicsWorld::actor_add_impulse)
-		.def("actor_add_impulse_at", &PhysicsWorld::actor_add_impulse_at)
-		.def("actor_add_torque_impulse", &PhysicsWorld::actor_add_torque_impulse)
-		.def("actor_push", &PhysicsWorld::actor_push)
-		.def("actor_push_at", &PhysicsWorld::actor_push_at)
-		.def("actor_is_sleeping", &PhysicsWorld::actor_is_sleeping)
-		.def("actor_wake_up", &PhysicsWorld::actor_wake_up)
-		.def("joint_create", &PhysicsWorld::joint_create)
-		.def("gravity", &PhysicsWorld::gravity)
-		.def("set_gravity", &PhysicsWorld::set_gravity)
-		.def("cast_ray_all", &PhysicsWorld::cast_ray_all)
-		.def("cast_sphere", &PhysicsWorld::cast_sphere)
-		.def("cast_box", &PhysicsWorld::cast_box)
-		.def("enable_debug_drawing", &PhysicsWorld::enable_debug_drawing)
+	world_
+		.def("spawn_unit", [](World& world, StringId64 name) { world.spawn_unit(name); })
+		.def("spawn_empty_unit", &World::spawn_empty_unit)
+		.def("destroy_unit", &World::destroy_unit)
+		.def("num_units", &World::num_units)
+		.def("spawn_unit", &World::spawn_unit)
+		.def("unit_by_name", &World::unit_by_name)
+		.def("camera_create", &World::camera_create)
+		.def("camera_destroy", &World::camera_destroy)
+		.def("camera_instance", &World::camera_instance)
+		.def("camera_set_projection_type", &World::camera_set_projection_type)
+		.def("camera_projection_type", &World::camera_projection_type)
+		.def("camera_fov", &World::camera_fov)
+		.def("camera_set_fov", &World::camera_set_fov)
+		.def("camera_near_clip_distance", &World::camera_near_clip_distance)
+		.def("camera_set_near_clip_distance", &World::camera_set_near_clip_distance)
+		.def("camera_far_clip_distance", &World::camera_far_clip_distance)
+		.def("camera_set_orthographic_size", &World::camera_set_orthographic_size)
+		.def("camera_screen_to_world", &World::camera_screen_to_world)
+		.def("camera_world_to_screen", &World::camera_world_to_screen)
+		.def("update_animations", &World::update_animations)
+		.def("update_scene", &World::update_scene)
+		.def("update", &World::update)
+		.def("play_sound", py::overload_cast<const SoundResource&, const bool, const f32, const Vector3&, const f32>(&World::play_sound))
+		.def("play_sound", py::overload_cast<StringId64, const bool, const f32, const Vector3&, const f32>(&World::play_sound))
+		.def("stop_sound", &World::stop_sound)
+		.def("link_sound", &World::link_sound)
+		.def("set_listener_pose", &World::set_listener_pose)
+		.def("set_sound_range", &World::set_sound_range)
+		.def("set_sound_volume", &World::set_sound_volume)
+		.def("create_debug_line", &World::create_debug_line)
+		.def("destroy_debug_line", &World::destroy_debug_line)
+		.def("create_screen_gui", &World::create_screen_gui)
+		.def("destroy_gui", &World::destroy_gui)
+		.def("load_level", &World::load_level)
+		.def_readwrite("scene_graph", &World::_scene_graph)
+		//.def_property_readonly("scene_graph",
+		//	py::cpp_function([](const World& world) {return world._scene_graph; }, py::return_value_policy::reference));
+		.def_readwrite("render_world", &World::_render_world)
+		.def_readwrite("physics_world", &World::_physics_world)
+		.def_readwrite("sound_world", &World::_sound_world)
+		.def_readwrite("animation_state_machine", &World::_animation_state_machine)
+		.def("disable_unit_callbacks", &World::disable_unit_callbacks)
+		.def_readwrite("scene_graph", &World::_scene_graph)
 		;
 
-	py::class_<SoundWorld>(m, "SoundWorld")
-		.def("stop_all", &SoundWorld::stop_all)
-		.def("pause_all", &SoundWorld::pause_all)
-		.def("resume_all", &SoundWorld::resume_all)
-		.def("is_playing", &SoundWorld::is_playing)
-		.def("pause_all", &SoundWorld::pause_all)
-		;
-
-	py::class_<AnimationStateMachine>(m, "AnimationStateMachine")
-		.def("instance", &AnimationStateMachine::instance)
-		.def("trigger", &AnimationStateMachine::trigger)
-		.def("variable_id", &AnimationStateMachine::variable_id)
-		.def("variable", &AnimationStateMachine::variable)
-		.def("set_variable", &AnimationStateMachine::set_variable)
-		;
+	level_.def(py::init<>([](UnitManager& um, World& w, const LevelResource& lr)
+		{
+			assert(false && "should not construct level in py");
+			return Level(default_allocator(), um, w, lr);
+		}));
 
 	//m.def_property_readonly_static("g_", [](const py::object&) {return g_; });
 	//m.attr("g_", []() {return device(); });
@@ -774,44 +929,6 @@ void init_world(py::module& m)
 			})
 		;
 
-	py::class_<DebugLine>(m, "DebugLine")
-		.def("add_line", &DebugLine::add_line)
-		.def("add_axes", &DebugLine::add_axes)
-		.def("add_arc", &DebugLine::add_arc)
-		.def("add_circle", &DebugLine::add_circle)
-		.def("add_cone", &DebugLine::add_cone)
-		.def("add_sphere", &DebugLine::add_sphere)
-		.def("add_obb", &DebugLine::add_obb)
-		.def("add_frustum", &DebugLine::add_frustum)
-		.def("reset", &DebugLine::reset)
-		.def("submit", &DebugLine::submit)
-		;
-
-	py::class_<ResourcePackage>(m, "ResourcePackage")
-		.def("load", &ResourcePackage::load)
-		.def("unload", &ResourcePackage::unload)
-		.def("flush", &ResourcePackage::flush)
-		.def("has_loaded", &ResourcePackage::has_loaded)
-		;
-
-	py::class_<Material>(m, "Material")
-		.def("set_float", &Material::set_float)
-		.def("set_vector2", &Material::set_vector2)
-		.def("set_vector3", &Material::set_vector3)
-		.def("set_vector4", &Material::set_vector4)
-		.def("set_matrix4x4", &Material::set_matrix4x4)
-		;
-
-	py::class_<Gui>(m, "Gui")
-		.def("move", &Gui::move)
-		.def("triangle", &Gui::triangle)
-		.def("rect", &Gui::rect)
-		.def("image", &Gui::image)
-		.def("image_uv", &Gui::image_uv)
-		.def("text", &Gui::text)
-		.def("text", &Gui::text)
-		;
-
 	//py::class_<Display>(m, "Display")
 	//	.def("modes", [](Display& display)
 	//		{
@@ -841,26 +958,6 @@ void init_world(py::module& m)
 		.def("set_cursor", &Window::set_cursor)
 		.def("set_cursor_mode", &Window::set_cursor_mode)
 		;
-
-
-	// level 中间结构体
-	py::class_<Level>(m, "Level")
-		.def(py::init<>([](UnitManager& um, World& w, const LevelResource& lr)
-			{
-				assert(false && "should not construct level in py");
-				return Level(default_allocator(), um, w, lr);
-			}))
-		;
-
-
-	py::class_<LevelResource>(m, "LevelResource")
-		.def(py::init<>([]()
-			{
-				assert(false && "should not construct LevelResource in py");
-				return LevelResource();
-			}))
-		;
-	//py::class_<>
 }
 
 PYBIND11_MODULE(crown, m) {
