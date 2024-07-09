@@ -365,13 +365,13 @@ bool Device::frame()
 		}
 	}
 
-	while (true)
-	{
-		std::string in_code;
-		std::cout << ">>>";
-		std::getline(std::cin, in_code);
-		_py_wrapper->run_string(in_code.c_str());
-	}
+	//while (true)
+	//{
+	//	std::string in_code;
+	//	std::cout << ">>>";
+	//	std::getline(std::cin, in_code);
+	//	_py_wrapper->run_string(in_code.c_str());
+	//}
 
 	_input_manager->update();
 
@@ -586,6 +586,7 @@ void Device::run()
 	logi(DEVICE, "Initialized in " TIME_FMT, time::seconds(time::now() - run_t0));
 
 	_py_wrapper->invoke("boot.init");
+	_py_wrapper->generate_stub("");
 
 	_prev_width = _width;
 	_prev_height = _height;

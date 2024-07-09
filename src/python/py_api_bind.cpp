@@ -1,5 +1,6 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/operators.h"
+#include "pybind11/embed.h"
 
 #include "fmt/format.h"
 #include "fmt/ranges.h"
@@ -104,6 +105,77 @@ auto format_as(const Sphere& f)
 	return fmt::format("Sphere(center:{}, radius:{})", f.c, f.r);
 }
 
+namespace PYBIND11_NAMESPACE {
+	namespace detail {
+		template <> struct type_caster<StringId64> {
+		public:
+			/**
+			 * This macro establishes the name 'StringId64' in
+			 * function signatures and declares a local variable
+			 * 'value' of type StringId64
+			 */
+			PYBIND11_TYPE_CASTER(StringId64, const_name("StringId64"));
+
+			/**
+			 * Conversion part 1 (Python->C++): convert a PyObject into a StringId64
+			 * instance or return false upon failure. The second argument
+			 * indicates whether implicit conversions should be applied.
+			 */
+			bool load(handle src, bool) {
+				bool ret = false;
+
+				if (py::isinstance<py::str>(src))
+				{
+					auto str = src.cast<std::string>();
+					value.hash(str.c_str(), str.size());
+					ret = true;
+				}
+
+				return ret && !PyErr_Occurred();
+			}
+
+			/**
+			 * Conversion part 2 (C++ -> Python): convert an StringId64 instance into
+			 * a Python object. The second and third arguments are used to
+			 * indicate the return value policy and parent object (for
+			 * ``return_value_policy::reference_internal``) and are generally
+			 * ignored by implicit casters.
+			 */
+			static handle cast(StringId64 src, return_value_policy /* policy */, handle /* parent */) {
+				char buf[STRING_ID64_BUF_LEN + 1];
+				src.to_string(buf, STRING_ID64_BUF_LEN + 1);
+				return py::str(buf);
+			}
+		};
+
+		template<>
+		struct type_caster<StringId32>
+		{
+			PYBIND11_TYPE_CASTER(StringId32, const_name("StringId32"));
+
+			bool load(handle src, bool)
+			{
+				bool ret = false;
+				if (py::isinstance<py::str>(src))
+				{
+					auto str = src.cast<std::string>();
+					value.hash(str.c_str(), str.size());
+					ret = true;
+				}
+
+				return ret && !PyErr_Occurred();
+			}
+
+			static handle cast(StringId32 src, return_value_policy /* policy */, handle /* parent */)
+			{
+				char buf[STRING_ID32_BUF_LEN + 1];
+				src.to_string(buf, STRING_ID32_BUF_LEN + 1);
+				return py::str(buf);
+			}
+		};
+	}
+} // namespace PYBIND11_NAMESPACE::detail
+
 void init_input(py::module& m)
 {
 #define KEYBOARD(name)																	\
@@ -124,8 +196,9 @@ void init_input(py::module& m)
 	key_m.def("num_buttons", KEYBOARD(num_buttons));
 	key_m.def("num_axes", KEYBOARD(num_axes));
 	key_m.def("pressed", KEYBOARDP(pressed, u8));
-	key_m.def("released", KEYBOARD(any_pressed));
+	key_m.def("released", KEYBOARDP(released, u8));
 	key_m.def("any_released", KEYBOARD(any_released));
+	key_m.def("any_pressed", KEYBOARD(any_pressed));
 	key_m.def("button", KEYBOARDP(button, u8));
 	key_m.def("button_name", KEYBOARDP(button_name, u8));
 	key_m.def("button_id", KEYBOARDP(button_id, StringId32));
@@ -845,11 +918,11 @@ void init_world(py::module& m)
 		;
 
 	world_
-		.def("spawn_unit", [](World& world, StringId64 name) { world.spawn_unit(name); })
+		.def("spawn_unit", [](World& world, StringId64 name) { return world.spawn_unit(name); })
 		.def("spawn_empty_unit", &World::spawn_empty_unit)
 		.def("destroy_unit", &World::destroy_unit)
 		.def("num_units", &World::num_units)
-		.def("spawn_unit", &World::spawn_unit)
+		//.def("spawn_unit", &World::spawn_unit)
 		.def("unit_by_name", &World::unit_by_name)
 		.def("camera_create", &World::camera_create)
 		.def("camera_destroy", &World::camera_destroy)
