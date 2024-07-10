@@ -375,6 +375,11 @@ void init_base(py::module& m)
 		.def_readwrite("y", &Matrix4x4::y)
 		.def_readwrite("z", &Matrix4x4::z)
 		.def_readwrite("t", &Matrix4x4::t)
+		.def_property("translation",
+			[](const Matrix4x4& mat) {return translation(mat); },
+			[](Matrix4x4& self, Vector3 vec) {set_translation(self, vec); }
+		)
+		.def_property_readonly("rotation", [](const Matrix4x4& mat) {return rotation(mat); })
 		.def(py::self += py::self)
 		.def(py::self -= py::self)
 		.def(py::self *= py::self)
@@ -622,6 +627,7 @@ void init_math_module(py::module& m)
 	m.def("from_axes", py::overload_cast<const Vector3&, const Vector3&, const Vector3&, const Vector3&>(from_axes));
 	m.def("transpose", py::overload_cast<Matrix4x4&>(transpose));
 	m.def("invert", py::overload_cast<Matrix4x4&>(invert));
+	m.def("from_axis_angle", from_axis_angle);
 }
 
 
@@ -918,11 +924,15 @@ void init_world(py::module& m)
 		;
 
 	world_
-		.def("spawn_unit", [](World& world, StringId64 name) { return world.spawn_unit(name); })
+		//.def("spawn_unit", [](World& world, StringId64 name) { return world.spawn_unit(name); })
 		.def("spawn_empty_unit", &World::spawn_empty_unit)
 		.def("destroy_unit", &World::destroy_unit)
 		.def("num_units", &World::num_units)
-		//.def("spawn_unit", &World::spawn_unit)
+		.def("spawn_unit", &World::spawn_unit,
+			py::arg("name"),
+			py::arg("pos") = VECTOR3_ZERO,
+			py::arg("rot") = QUATERNION_IDENTITY,
+			py::arg("scl") = VECTOR3_ONE)
 		.def("unit_by_name", &World::unit_by_name)
 		.def("camera_create", &World::camera_create)
 		.def("camera_destroy", &World::camera_destroy)
