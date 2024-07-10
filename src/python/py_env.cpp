@@ -13,57 +13,97 @@
 #include <stdarg.h>
 #include <string>
 #include <vector>
+#include "fmt/format.h"
+#include "fmt/color.h"
 
 #include "Python.h"
 
 using namespace crown;
 LOG_SYSTEM(PY, "python");
-/// <summary>
-/// redirect stdout stderr stdin
-/// </summary>
-PyObject* aview_write(PyObject* self, PyObject* args)
+
+
+PyObject* simple_msg(PyObject* self, PyObject* args)
 {
 	const char* what;
 	if (!PyArg_ParseTuple(args, "s", &what))
 		return NULL;
-	//printf("==%s==", what);
 	printf("%s", what);
 	return Py_BuildValue("");
 }
 
+PyObject* simple_error(PyObject* self, PyObject* args)
+{
+	const char* what;
+	if (!PyArg_ParseTuple(args, "s", &what))
+		return NULL;
+	fmt::print(fg(fmt::color::red), "{}", what);
+	return Py_BuildValue("");
+}
 
-PyObject* aview_flush(PyObject* self, PyObject* args)
+//
+//int main() {
+//	fmt::print(fg(fmt::color::crimson) | fmt::emphasis::bold,
+//		"Hello, {}!\n", "world");
+//	fmt::print(fg(fmt::color::floral_white) | bg(fmt::color::slate_gray) |
+//		fmt::emphasis::underline, "Ol¨¢, {}!\n", "Mundo");
+//	fmt::print(fg(fmt::color::steel_blue) | fmt::emphasis::italic,
+//		"ÄãºÃ{}£¡\n", "ÊÀ½ç");
+//}
+
+PyObject* simple_flush(PyObject* self, PyObject* args)
 {
 	return Py_BuildValue("");
 }
 
 
-PyMethodDef aview_methods[] =
+PyMethodDef simple_msg_methods[] =
 {
-	{"write", aview_write, METH_VARARGS, "doc for write"},
-	{"flush", aview_flush, METH_VARARGS, "doc for flush"},
+	{"write", simple_msg, METH_VARARGS, "doc for write"},
+	{"flush", simple_flush, METH_VARARGS, "doc for flush"},
 	{0, 0, 0, 0} // sentinel
 };
 
 
-PyModuleDef aview_module =
+PyMethodDef simple_error_methods[] =
+{
+	{"write", simple_error, METH_VARARGS, "doc for write"},
+	{"flush", simple_flush, METH_VARARGS, "doc for flush"},
+	{0, 0, 0, 0} // sentinel
+};
+
+PyModuleDef msg_module =
 {
 	PyModuleDef_HEAD_INIT, // PyModuleDef_Base m_base;
 	"aview",               // const char* m_name;
 	"doc for aview",       // const char* m_doc;
 	-1,                    // Py_ssize_t m_size;
-	aview_methods,        // PyMethodDef *m_methods
+	simple_msg_methods,        // PyMethodDef *m_methods
 	//  inquiry m_reload;  traverseproc m_traverse;  inquiry m_clear;  freefunc m_free;
 };
 
-PyMODINIT_FUNC PyInit_aview(void)
+PyModuleDef error_module =
 {
-	PyObject* m = PyModule_Create(&aview_module);
-	PySys_SetObject("stdout", m);
-	PySys_SetObject("stderr", m);
-	return m;
+	PyModuleDef_HEAD_INIT, // PyModuleDef_Base m_base;
+	"aview",               // const char* m_name;
+	"doc for aview",       // const char* m_doc;
+	-1,                    // Py_ssize_t m_size;
+	simple_error_methods,        // PyMethodDef *m_methods
+	//  inquiry m_reload;  traverseproc m_traverse;  inquiry m_clear;  freefunc m_free;
+};
+
+PyMODINIT_FUNC PyInit_msg(void)
+{
+	PyObject* msg = PyModule_Create(&msg_module);
+	PySys_SetObject("stdout", msg);
+	return msg;
 }
 
+PyMODINIT_FUNC PyInit_err(void)
+{
+	PyObject* err = PyModule_Create(&error_module);
+	PySys_SetObject("stderr", err);
+	return err;
+}
 
 /// end redirect
 
@@ -100,9 +140,11 @@ void crown::PyWrapper::init(const char** argv)
 	config.safe_path = 0;
 
 	ii();
-	PyImport_AppendInittab("aview", PyInit_aview);
+	PyImport_AppendInittab("crown_msg", PyInit_msg);
+	PyImport_AppendInittab("crown_err", PyInit_err);
 	PyStatus status = Py_InitializeFromConfig(&config);
-	PyImport_ImportModule("aview");
+	PyImport_ImportModule("crown_msg");
+	PyImport_ImportModule("crown_err");
 	CE_ASSERT(Py_IsInitialized(), "python initialization failed: %s\n", status.err_msg);
 
 	_local = _global = PyDict_New();
