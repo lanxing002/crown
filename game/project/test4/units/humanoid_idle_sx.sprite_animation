@@ -1,0 +1,11 @@
+_guid = "bdbcaaed-4c0f-444c-812f-3319d43b5f86"
+_type = "sprite_animation"
+frames = [
+	{
+		_guid = "b1227ffa-a2d5-413b-ae4e-2d075c3ce0b1"
+		_type = "animation_frame"
+		frame = 9
+		index = 0
+	}
+]
+total_time = 1

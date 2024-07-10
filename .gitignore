@@ -4,6 +4,8 @@
 # Ignore Python stuff
 __pycache__
 
+/**/.idea/**/*
+/**/.vscode/**/*
 /samples/*_android
 /samples/*_linux
 /samples/*_windows

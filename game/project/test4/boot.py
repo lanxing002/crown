@@ -1,16 +1,15 @@
 import crown
 import math
-from fps_camera import FPSCamera
 
 
 class Game:
 
     def __int__(self):
         self.world: crown.World = None
-        self.camera: FPSCamera = None
+        self.camera: crown.CameraInstance = None
         self.camera_unit: crown.UnitId = None
-        # self.players: list[crown.UnitId] = None
-        # self.avatar: crown.UnitId = None
+        self.players: list[crown.UnitId] = None
+        self.avatar: crown.UnitId = None
 
 
 game = Game()
@@ -35,20 +34,15 @@ def init():
     scene_graph.set_local_position(camera_trans, crown.Vector3(0, 8, 0))
     scene_graph.set_local_rotation(camera_trans, crown.math.from_axis_angle(crown.math.vec3_right, 90 * (math.pi / 180.0)))
 
-    # player1 = world.spawn_unit("units/soldier", crown.Vector3(-2, 0, 0))
-    # player2 = world.spawn_unit("units/princess", crown.Vector3(-8, 0, 0))
-
-    world.load_level('levels/test', crown.math.vec3_zero, crown.math.quat_identity)
-
-    world.physics_world.enable_debug_drawing(True)
-    world.render_world.enable_debug_drawing(True)
+    player1 = world.spawn_unit("units/soldier", crown.Vector3(-2, 0, 0))
+    player2 = world.spawn_unit("units/princess", crown.Vector3(-8, 0, 0))
 
     global game
-    # game.avatar = player1
-    # game.players = [player1, player2]
+    game.avatar = player1
+    game.players = [player1, player2]
     game.world = world
+    game.camera = camera
     game.camera_unit = camera_unit
-    game.camera = FPSCamera(world, camera_unit)
     print('----> init world done <-----')
 
 
@@ -58,15 +52,11 @@ cnt = 0
 def update(dt):
     global game, cnt
     game.world.update(dt)
-
-    delta = crown.mouse.axis(crown.mouse.axis_id("cursor_delta"))
-    game.camera.upate(dt, delta.x, delta.y)
-    # game.camera.
-    # asm = game.world.animation_state_machine
-    # asm.trigger(asm.instance(game.avatar), 'run')
-    # cnt += 1
-    # if (cnt // 40) % 2 == 0:
-    #     asm.trigger(asm.instance(game.avatar), 'idle')
+    asm = game.world.animation_state_machine
+    asm.trigger(asm.instance(game.avatar), 'run')
+    cnt += 1
+    if (cnt // 40) % 2 == 0:
+        asm.trigger(asm.instance(game.avatar), 'idle')
     # if crown.keyboard.released(crown.keyboard.button_id("escape")):
     # device.quit()
     # print('escape key pushed ... ')

@@ -1,0 +1,17 @@
+_guid = "f174f984-efac-446c-9dcc-ca8c2f78cb52"
+_type = "material"
+shader = "sprite"
+textures = {
+	u_albedo = "units/environment/tree"
+}
+uniforms = {
+	u_color = {
+		type = "vector4"
+		value = [
+			1
+			1
+			1
+			1
+		]
+	}
+}
