@@ -1,0 +1,300 @@
+"59eab20db8fd7280" = [
+    "//- core/game/boot.lua"
+    "//- core/units/camera.unit"
+    "//- global.physics_config"
+    "//- core/shaders/default.shader"
+    "//- units/sphere.unit"
+    "//- levels/test.level"
+    "//- boot.package"
+]
+"a3d2da8e90165a00" = [
+    "//- core/editors/unit.lua"
+    "//r core/lua/class.lua"
+]
+"b33c04f41ad80887" = [
+    "//- units/sphere.mesh"
+]
+"daa04a87276e4a0d" = [
+    "//- core/units/primitives/cone.unit"
+    "//- core/units/primitives/cone.mesh"
+    "//r core/units/primitives/primitive.material"
+    "//r core/units/primitives/cone.mesh"
+]
+"95c7a63bec07448d" = [
+    "//- core/shaders/common.shader"
+]
+"ac9ffc0274b6460e" = [
+    "//- core/units/camera.material"
+]
+"5f85a4535e0b940f" = [
+    "//- core/editors/level_editor/boot.package"
+    "//- core/units/camera.unit"
+    "//- global.physics_config"
+    "//- core/shaders/default.shader"
+    "//- core/editors/level_editor/boot.lua"
+]
+"53bd9875f45c4d91" = [
+    "//- core/components/noop.material"
+]
+"1dfbf8e622308512" = [
+    "//- core/components/noop.state_machine"
+    "//r core/components/noop.sprite_animation"
+]
+"72fbf6bbdd609893" = [
+    "//- core/units/primitives/cone.mesh"
+]
+"e805cdd4e9592d94" = [
+    "//- core/editors/unit_preview/boot.config"
+]
+"be0a274b368d3f96" = [
+    "//- core/editors/level_editor/camera.lua"
+    "//r core/lua/class.lua"
+]
+"53574437a33f6497" = [
+    "//- core/editors/level_editor/boot.lua"
+    "//r core/editors/level_editor/level_editor.lua"
+]
+"3a50ec39f6fcfc97" = [
+    "//- core/fallback/fallback.material"
+]
+"5538526945c98218" = [
+    "//- boot.lua"
+    "//r core/game/camera.lua"
+]
+"1b67b8c8e0d6da19" = [
+    "//- units/sphere.mesh"
+    "//- units/sphere.unit"
+    "//r units/sphere.mesh"
+    "//r units/grid.material"
+]
+"584cefb677e1a71f" = [
+    "//- core/game/game.lua"
+    "//r core/game/camera.lua"
+]
+"0853b44a7d51a5a3" = [
+    "//- core/editors/level_editor/level_editor.lua"
+    "//r core/editors/unit.lua"
+    "//r core/editors/sound.lua"
+    "//r core/lua/class.lua"
+    "//r core/editors/level_editor/camera.lua"
+]
+"3fe1fa2989a513a3" = [
+    "//- core/units/primitives/plane.unit"
+    "//- core/units/primitives/plane.mesh"
+    "//r core/units/primitives/primitive.material"
+    "//r core/units/primitives/plane.mesh"
+]
+"4e92a055b55bdaa6" = [
+    "//- units/notexture.material"
+]
+"465407355a6f78a8" = [
+    "//- core/units/primitives/cube.mesh"
+]
+"2f0cbaedf7023628" = [
+    "//- core/units/sound.material"
+]
+"f2bac399116b132a" = [
+    "//- core/units/primitives/primitive.material"
+]
+"1833a1185fe784ac" = [
+    "//- core/components/noop.lua"
+]
+"e711c56fdf0d8f33" = [
+    "//- core/units/camera.lua"
+]
+"264b2a25ea3cf834" = [
+    "//- core/editors/sound.lua"
+    "//r core/lua/class.lua"
+]
+"ee0fbb09a061aa36" = [
+    "//- core/units/primitives/cube.unit"
+    "//- core/units/primitives/cube.mesh"
+    "//r core/units/primitives/primitive.material"
+    "//r core/units/primitives/cube.mesh"
+]
+"cba2e767ae4294b6" = [
+    "//- units/grid.material"
+    "//r units/grid.texture"
+]
+"96b68ada6022cb3c" = [
+    "//- core/units/light.material"
+]
+"97ba461573abc13d" = [
+    "//- core/units/primitives/plane.mesh"
+]
+"28e813b7b14267bf" = [
+    "//- units/skydome.material"
+    "//r units/skydome.texture"
+]
+"ebd21ddf1c57b541" = [
+    "//- core/game/boot.lua"
+    "//r core/game/game.lua"
+    "//r main.lua"
+]
+"8ad7961725812ec1" = [
+    "//- units/skydome.mesh"
+]
+"34890f7af4e18242" = [
+    "//- core/units/light.mesh"
+]
+"bba9acea038cf843" = [
+    "//- core/units/primitives/sphere.mesh"
+]
+"f10354018b49b0c3" = [
+    "//- core/components/noop.sprite_animation"
+]
+"50bf1e8a201cad43" = [
+    "//- units/plane.mesh"
+    "//- units/plane.unit"
+    "//r units/plane.mesh"
+    "//r units/grid.material"
+]
+"a640d8567f096d43" = [
+    "//- core/game/camera.lua"
+    "//r core/lua/class.lua"
+]
+"cb2f181b233f0844" = [
+    "//- core/editors/unit_preview/boot.lua"
+    "//r core/editors/unit_preview/unit_preview.lua"
+]
+"707d91f869594147" = [
+    "//- core/editors/level_editor/boot.config"
+]
+"761287a68fafa7c8" = [
+    "//- boot.config"
+]
+"2568837199cfadc8" = [
+    "//- core/units/sound.unit"
+    "//r core/units/sound.material"
+    "//r core/units/sound.mesh"
+]
+"90b5f332c8cea9ca" = [
+    "//- units/ramp.unit"
+    "//- units/ramp.mesh"
+    "//r units/ramp.mesh"
+    "//r units/grid.material"
+]
+"34255d1b98edf652" = [
+    "//- core/components/noop.sprite"
+]
+"0f6a9fe696ee2752" = [
+    "//- units/skydome.texture"
+    "//- units/skydome.tga"
+]
+"38ee4f0e32c07b54" = [
+    "//- units/ramp.mesh"
+]
+"8d333f4d63c17f56" = [
+    "//- core/units/sound.mesh"
+]
+"ec206b3689eed45b" = [
+    "//- units/grid.texture"
+    "//- units/grid.tga"
+]
+"c7fdf87fde0bf8dc" = [
+    "//- core/units/camera.unit"
+    "//- global.physics_config"
+    "//- core/shaders/default.shader"
+    "//- core/editors/unit_preview/boot.package"
+    "//- core/editors/unit_preview/boot.lua"
+]
+"9cd2b3460eef50dc" = [
+    "//- core/units/light.unit"
+    "//r core/units/light.material"
+    "//r core/units/light.mesh"
+]
+"f8e4a2b6da127fdd" = [
+    "//- units/plane.mesh"
+]
+"13f210d6f9822add" = [
+    "//- core/units/primitives/sphere.mesh"
+    "//- core/units/primitives/sphere.unit"
+    "//r core/units/primitives/sphere.mesh"
+    "//r core/units/primitives/primitive.material"
+]
+"228c2a2bdf8ffc5f" = [
+    "//- units/skydome.unit"
+    "//r units/skydome.material"
+    "//r units/skydome.mesh"
+]
+"79ccc4fd1e998461" = [
+    "//- global.physics_config"
+]
+"4eda671955829e61" = [
+    "//- core/shaders/default.shader"
+    "//- core/shaders/common.shader"
+]
+"db34642fd84d6a63" = [
+    "//- core/units/primitives/cylinder.mesh"
+    "//- core/units/primitives/cylinder.unit"
+    "//r core/units/primitives/cylinder.mesh"
+    "//r core/units/primitives/primitive.material"
+]
+"7c10e47248b47567" = [
+    "//- core/editors/unit_preview/unit_preview.lua"
+    "//r core/editors/unit.lua"
+    "//r core/editors/level_editor/camera.lua"
+]
+"4bd2bfc1e620d26e" = [
+    "//- units/cube.mesh"
+]
+"a6fbc59e1a7bddee" = [
+    "//- core/units/camera.unit"
+    "//r core/units/camera.lua"
+    "//r core/units/camera.mesh"
+    "//r core/units/camera.material"
+]
+"f1821dd5609f04ef" = [
+    "//- core/components/noop.mesh"
+]
+"e38903fd1c2e00f0" = [
+    "//- units/cube.unit"
+    "//- units/cube.mesh"
+    "//r units/cube.mesh"
+    "//r units/grid.material"
+]
+"0ea079a2e0750f70" = [
+    "//- core/units/camera.mesh"
+]
+"a15926af06ae8070" = [
+    "//- core/lua/class.lua"
+]
+"c8e3926a0f5bdb72" = [
+    "//- core/units/light.unit"
+    "//- core/editors/levels/empty.level"
+    "//r core/units/light.material"
+    "//r core/units/light.mesh"
+]
+"3034d5a598316777" = [
+    "//- core/fallback/fallback.unit"
+]
+"1dd26068d150bc7a" = [
+    "//- core/fallback/fallback.texture"
+    "//- core/fallback/fallback.png"
+]
+"a4b2083aab8297fc" = [
+    "//- core/units/light.unit"
+    "//- core/units/camera.unit"
+    "//- units/ramp.unit"
+    "//- units/cube.unit"
+    "//- units/cube.mesh"
+    "//- units/ramp.mesh"
+    "//- units/skydome.unit"
+    "//- units/plane.mesh"
+    "//- units/plane.unit"
+    "//- levels/test.level"
+    "//r units/skydome.material"
+    "//r core/units/camera.lua"
+    "//r units/cube.mesh"
+    "//r core/units/camera.mesh"
+    "//r core/units/light.material"
+    "//r units/ramp.mesh"
+    "//r core/units/camera.material"
+    "//r core/units/light.mesh"
+    "//r units/skydome.mesh"
+    "//r units/plane.mesh"
+    "//r units/grid.material"
+]
+"736fd8132243b8fd" = [
+    "//- core/units/primitives/cylinder.mesh"
+]
