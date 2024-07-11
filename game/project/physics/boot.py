@@ -22,6 +22,9 @@ device = crown.Device.g_device
 
 
 def init():
+    # import pydevd_pycharm
+    # pydevd_pycharm.settrace('localhost', port=7889, stdoutToServer=True, stderrToServer=True)
+
     # Create world and camera
     world = device.create_world()
     camera_unit = world.spawn_unit("core/units/camera")
@@ -30,7 +33,7 @@ def init():
     # game load level
     camera = world.camera_instance(camera_unit)
     world.camera_set_orthographic_size(camera, 540 / 2 / 32)
-    world.camera_set_projection_type(camera, crown.ProjectionType.ORTHOGRAPHIC)
+    world.camera_set_projection_type(camera, crown.ProjectionType.PERSPECTIVE)
     camera_trans = scene_graph.instance(camera_unit)
     scene_graph.set_local_position(camera_trans, crown.Vector3(0, 8, 0))
     scene_graph.set_local_rotation(camera_trans, crown.math.from_axis_angle(crown.math.vec3_right, 90 * (math.pi / 180.0)))

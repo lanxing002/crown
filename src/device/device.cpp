@@ -370,6 +370,8 @@ bool Device::frame()
 	//	std::string in_code;
 	//	std::cout << ">>>";
 	//	std::getline(std::cin, in_code);
+	//	if (in_code == "quit")
+	//		break;
 	//	_py_wrapper->run_string(in_code.c_str());
 	//}
 

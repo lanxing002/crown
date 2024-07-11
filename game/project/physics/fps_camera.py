@@ -5,7 +5,7 @@ class FPSCamera:
     def __init__(self, world: crown.World, unit: crown.UnitId):
         self._world = world
         self._unit = unit
-        self._move_speed = 20
+        self._move_speed = 40
         self._rotation_speed = 0.14
 
     @property
@@ -40,6 +40,12 @@ class FPSCamera:
         skey = crown.keyboard.pressed(s) or crown.keyboard.released(s)
         akey = crown.keyboard.pressed(a) or crown.keyboard.released(a)
         dkey = crown.keyboard.pressed(d) or crown.keyboard.released(d)
+        if crown.keyboard.pressed(w):
+            print('pressed w')
+
+        if crown.keyboard.released(w):
+            print('released w')
+
         translation_speed = self._move_speed * dt
         if wkey:
             pos += view_dir * translation_speed * dt
