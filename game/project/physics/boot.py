@@ -25,6 +25,8 @@ def init():
     # import pydevd_pycharm
     # pydevd_pycharm.settrace('localhost', port=7889, stdoutToServer=True, stderrToServer=True)
 
+    # device.window
+
     # Create world and camera
     world = device.create_world()
     camera_unit = world.spawn_unit("core/units/camera")
@@ -52,6 +54,11 @@ def init():
     game.world = world
     game.camera_unit = camera_unit
     game.camera = FPSCamera(world, camera_unit)
+    crown.Window.set_title("window title test")
+    crown.Window.show_cursor(False)
+    crown.Window.set_cursor_mode(crown.CursorMode.DISABLED)
+    # device.window.show_cursor(False)
+    # win = device.window
     print('----> init world done <-----')
 
 

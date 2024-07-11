@@ -984,6 +984,22 @@ void init_world(py::module& m)
 	//m.def_property_readonly_static("g_", [](const py::object&) {return g_; });
 	//m.attr("g_", []() {return device(); });
 
+	py::class_<Window>(m, "Window")
+		.def_static("show",				[]() {return device()->_window->show(); })
+		.def_static("hide",				[]() {return device()->_window->hide(); })
+		.def_static("resize",			[](u16 w, u16 h) {return device()->_window->resize(w, h); })
+		.def_static("move",				[](u16 x, u16 y) {return device()->_window->move(x, y); })
+		.def_static("minimize",			[]() {return device()->_window->minimize(); })
+		.def_static("maximize",			[]() {return device()->_window->maximize(); })
+		.def_static("restore",			[]() {return device()->_window->restore(); })
+		.def_static("title",			[]() {return device()->_window->title(); })
+		.def_static("set_title",		[](const char* title) {return device()->_window->set_title(title); })
+		.def_static("show_cursor",		[](bool show) {return device()->_window->show_cursor(show); })
+		.def_static("set_fullscreen",	[](bool full_screen) {return device()->_window->set_fullscreen(full_screen); })
+		.def_static("set_cursor",		[](MouseCursor::Enum cursor) {return device()->_window->set_cursor(cursor); })
+		.def_static("set_cursor_mode",	[](CursorMode::Enum mode) {return device()->_window->set_cursor_mode(mode); })
+		;
+
 	py::class_<Device>(m, "Device")
 		.def_property_readonly_static("g_device", [](const py::object&) {return device(); })
 		.def("argv", [](Device& device) {
@@ -997,6 +1013,7 @@ void init_world(py::module& m)
 		.def_property_readonly("platform", [](py::object) {return CROWN_PLATFORM_NAME; })
 		.def_property_readonly("architecture", [](py::object) {return CROWN_ARCH_NAME; })
 		.def_property_readonly("version", [](py::object) {return CROWN_VERSION; })
+		//.def_readonly("window", &Device::_window)
 		.def("quit", &Device::quit)
 		.def("resolution", &Device::resolution)
 		.def("create_world", &Device::create_world, py::return_value_policy::reference)
@@ -1027,22 +1044,6 @@ void init_world(py::module& m)
 	//			return ret;
 	//		})
 	//	.def("set_mode", Display::set_mode);
-
-	py::class_<Window>(m, "Window")
-		.def("show", &Window::show)
-		.def("hide", &Window::hide)
-		.def("resize", &Window::resize)
-		.def("move", &Window::move)
-		.def("minimize", &Window::minimize)
-		.def("maximize", &Window::maximize)
-		.def("restore", &Window::restore)
-		.def("title", &Window::title)
-		.def("set_title", &Window::set_title)
-		.def("show_cursor", &Window::show_cursor)
-		.def("set_fullscreen", &Window::set_fullscreen)
-		.def("set_cursor", &Window::set_cursor)
-		.def("set_cursor_mode", &Window::set_cursor_mode)
-		;
 }
 
 PYBIND11_MODULE(crown, m) {

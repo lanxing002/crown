@@ -1390,7 +1390,7 @@ void load_api(LuaEnvironment &env)
 			LUA_ASSERT(device()->_resource_manager->can_get(RESOURCE_TYPE_UNIT, name)
 				, stack
 				, "Unit not loaded: " RESOURCE_ID_FMT_STR
-				, resource_id(RESOURCE_TYPE_UNIT, name).to_string(name_str, sizeof(name_str))
+				, resource_id(RESOURCE_TYPE_UNIT, name).to_string(name_str, sizeof(name_str))f
 				);
 			CE_UNUSED(name_str);
 

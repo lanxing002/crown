@@ -1,12 +1,13 @@
 import crown
 
-
 class FPSCamera:
     def __init__(self, world: crown.World, unit: crown.UnitId):
         self._world = world
         self._unit = unit
         self._move_speed = 40
-        self._rotation_speed = 0.14
+        self._rotation_speed = 0.44
+        self._keys = [crown.keyboard.button_id(x) for x in ['w', 's', 'a', 'd']]
+        self._keys_pressed = [False, False, False, False]  # w s a d
 
     @property
     def unit(self):
@@ -35,29 +36,26 @@ class FPSCamera:
 
             self._world.scene_graph.set_local_pose(trans_ins, new_rot)
 
-        w, s, a, d = [crown.keyboard.button_id(x) for x in ['w', 's', 'a', 'd']]
-        wkey = crown.keyboard.pressed(w) or crown.keyboard.released(w)
-        skey = crown.keyboard.pressed(s) or crown.keyboard.released(s)
-        akey = crown.keyboard.pressed(a) or crown.keyboard.released(a)
-        dkey = crown.keyboard.pressed(d) or crown.keyboard.released(d)
-        if crown.keyboard.pressed(w):
-            print('pressed w')
+        for i in range(len(self._keys)):
+            if crown.keyboard.pressed(self._keys[i]):
+                self._keys_pressed[i] = True
 
-        if crown.keyboard.released(w):
-            print('released w')
+        for i in range(len(self._keys)):
+            if crown.keyboard.released(self._keys[i]):
+                self._keys_pressed[i] = False
 
         translation_speed = self._move_speed * dt
-        if wkey:
-            pos += view_dir * translation_speed * dt
+        if self._keys_pressed[0]:
+            pos += view_dir * translation_speed
 
-        if skey:
-            pos -= view_dir * translation_speed * dt
+        if self._keys_pressed[1]:
+            pos -= view_dir * translation_speed
 
-        if akey:
-            pos -= right_dir * translation_speed * dt
+        if self._keys_pressed[2]:
+            pos -= right_dir * translation_speed
 
-        if dkey:
-            pos += right_dir * translation_speed * dt
+        if self._keys_pressed[3]:
+            pos += right_dir * translation_speed
 
         self._world.scene_graph.set_local_position(trans_ins, pos)
 
