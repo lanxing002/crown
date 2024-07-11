@@ -15,17 +15,17 @@ class FPSCamera:
     def camera(self):
         return self._world.camera_instance(self._unit)
 
-    def upate(self, dt, dx, dy):
+    def update(self, dt, dx, dy):
         trans_ins = self._world.scene_graph.instance(self._unit)
         camera_pose = self._world.scene_graph.local_pose(trans_ins)
         pos = camera_pose.translation
-        view_dir = camera_pose.z
-        right_dir = camera_pose.x
+        view_dir = crown.Vector3(camera_pose.z)
+        right_dir = crown.Vector3(camera_pose.x)
 
-        if dx > 0 and dy > 0:
+        if dx != 0 and dy != 0:
             rot_delta = self._rotation_speed * dt
             rot_around_world_up = crown.Quaternion(crown.Vector3(0, 1, 0), dx * rot_delta)
-            rot_around_camera_right = crown.Quaternion(camera_pose.x, dy * rot_delta)
+            rot_around_camera_right = crown.Quaternion(crown.Vector3(camera_pose.x), dy * rot_delta)
             rotation = rot_around_world_up * rot_around_camera_right
 
             old_rot = crown.math.from_quaternion(camera_pose.rotation)

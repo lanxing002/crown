@@ -60,7 +60,7 @@ def update(dt):
     game.world.update(dt)
 
     delta = crown.mouse.axis(crown.mouse.axis_id("cursor_delta"))
-    game.camera.upate(dt, delta.x, delta.y)
+    game.camera.update(dt, delta.x, delta.y)
     # game.camera.
     # asm = game.world.animation_state_machine
     # asm.trigger(asm.instance(game.avatar), 'run')
