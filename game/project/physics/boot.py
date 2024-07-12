@@ -54,11 +54,9 @@ def init():
     game.world = world
     game.camera_unit = camera_unit
     game.camera = FPSCamera(world, camera_unit)
-    crown.Window.set_title("window title test")
-    crown.Window.show_cursor(False)
-    crown.Window.set_cursor_mode(crown.CursorMode.DISABLED)
-    # device.window.show_cursor(False)
-    # win = device.window
+    device.window.set_title("window title test")
+    device.window.show_cursor(False)
+    device.window.set_cursor_mode(crown.CursorMode.DISABLED)
     print('----> init world done <-----')
 
 
